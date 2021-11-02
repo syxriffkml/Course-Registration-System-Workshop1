@@ -42,11 +42,18 @@ void function::ConnectionFunction() {
         system("cls");
     }
     else {
-        cout << "Failed To Connect!" << mysql_errno(conn) << endl;
+        cout << "Failed To Connect! MySQL Error #" << mysql_errno(conn) << endl;
     }
 }
 //End of database connection function
 
+
+void function::WriteInColor(unsigned short color, string outputString)
+{
+    HANDLE hcon = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleTextAttribute(hcon, color);
+    cout << outputString;
+}
 
 void function::mainMenu(int& selection) {
 
@@ -63,7 +70,7 @@ void function::mainMenu(int& selection) {
 
 
 //Start of student register function
-char function::registration() {
+void function::registration() {
 
     string username, ic_num, gender, email, password;
 
@@ -71,7 +78,6 @@ char function::registration() {
     cout << "                           STUDENT REGISTRATION                         " << endl;
     cout << "========================================================================" << endl;
     cout << "Enter username : ";
-    cin.ignore();
     getline(cin, username);
 
     cout << "Enter IC number ( without - ) : ";
@@ -110,14 +116,10 @@ char function::registration() {
             qstate = mysql_query(conn, insertStudentRegister);
 
             if (!qstate) {
-
-                char c;
-                cout << endl << "You have been registered. Do you want to log in? (y/n): ";
-                cin >> c;
-                if (c == 'y' || c == 'Y')
-                    studentLogin();
-                else
-                    return c;
+                cout << endl << "You have successfully registered! ";
+                system("pause");
+                system("cls");
+                return;
             }
             else {
                 cout << "Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
@@ -160,7 +162,8 @@ int function::studentLogin() {
                         stuID = row[0]; //ibarat $_SESSION dalam php la gitu
                     }
                     system("cls");
-                    cout << endl << ifstream("interface/CorrectLogin.txt").rdbuf() << endl << endl << endl << endl;
+                    cout << "CORRECT LOGIN!" << endl;
+                    //cout << endl << ifstream("interface/CorrectLogin.txt").rdbuf() << endl << endl << endl << endl;
                     system("pause");
                     system("cls");
                     return count=0;
@@ -173,7 +176,7 @@ int function::studentLogin() {
                         system("cls");
                         Beep(1000, 500);
                         cout << "ERROR, INCORRECT IC NUMBER/PASSWORD" << endl;
-                        cout << endl << ifstream("interface/ErrorLogin.txt").rdbuf() << endl << endl << endl << endl;
+                        //cout << endl << ifstream("interface/ErrorLogin.txt").rdbuf() << endl << endl << endl << endl;
                         system("pause");
                         system("cls");
                         return count;
@@ -182,7 +185,7 @@ int function::studentLogin() {
                         system("cls");
                         Beep(1000, 500);
                         cout << "ERROR, INCORRECT IC NUMBER/PASSWORD" << endl;
-                        cout << endl << ifstream("interface/ErrorLogin.txt").rdbuf() << endl << endl << endl << endl;
+                        //cout << endl << ifstream("interface/ErrorLogin.txt").rdbuf() << endl << endl << endl << endl;
                         system("pause");
                         system("cls");
                         goto student_login;
@@ -210,11 +213,34 @@ int function::studentLogin() {
 
 
 void function::studentMenu() {
+    string username;
+    string querry = "select username from student where student_id = '" + stuID + "'";
+    const char* getUsername = querry.c_str();
+    qstate = mysql_query(conn, getUsername);
+    if (!qstate) {
 
-    cout << "========================================================================" << endl;
-    cout << "                              STUDENT MENU                             " << endl;
-    cout << "========================================================================" << endl;
-    cout << "STUDENT PUNYA MENU" << endl;
+        res = mysql_store_result(conn);
+        if (res->row_count == 1) { //Able to login :)
+            while (row = mysql_fetch_row(res)) {
+                username = row[0]; 
+            }
+        }
+        else {
+            cout << "Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
+        }
+        cout << "========================================================================" << endl;
+        cout << "Welcome, user ";
+        WriteInColor(12, username + "\n");
+        WriteInColor(7," ");
+        cout << "                              STUDENT MENU                             " << endl;
+        cout << "========================================================================" << endl;
+        cout << "STUDENT PUNYA MENU" << endl;
+    }
+    else {
+        cout << "Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
+    }
+
+    
 }
 
 void function::adminMenu() {

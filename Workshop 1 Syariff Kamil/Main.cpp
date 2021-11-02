@@ -34,6 +34,7 @@ int main() {
     if (selection == 1) {
         selection=arrowKey.loginSelection();
         if (selection == 1) {
+            f.studentLogin();
             f.studentMenu();
         }
         else if (selection == 2) {
@@ -41,13 +42,8 @@ int main() {
         }
     }
     else if (selection == 2) {
-        choice = f.registration();
-        if (choice == 'y' || choice == 'Y') {
-            f.studentLogin();
-        }
-        else {
-            main();
-        }
+        f.registration();
+        main();
     }
     else if (selection == 3) {
         return 0;
