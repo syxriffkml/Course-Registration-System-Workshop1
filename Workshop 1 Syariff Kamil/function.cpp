@@ -8,6 +8,7 @@
 #include <string>
 #include <mysql.h>
 #include "function.h" // functions
+#include "arrowKeySelection.h" // menu arrow keys selection function header
 
 using namespace std;
 
@@ -47,14 +48,28 @@ void function::ConnectionFunction() {
 //End of database connection function
 
 
+void function::mainMenu(int& selection) {
+
+    arrowKeySelection arrowKey;
+
+
+    cout << "========================================================================" << endl;
+    cout << "                         COURSE ADMISSION SYSTEM                        " << endl;
+    cout << "                               -MAIN MENU-                              " << endl;
+    cout << "========================================================================" << endl;
+    selection = arrowKey.mainMenuSelection(); //return 1. login selection(student or admin), 2. Register, 3. Exit
+    
+}
+
+
 //Start of student register function
 char function::registration() {
 
     string username, ic_num, gender, email, password;
 
-    cout << "========================================" << endl;
-    cout << "          STUDENT REGISTRATION          " << endl;
-    cout << "========================================" << endl;
+    cout << "========================================================================" << endl;
+    cout << "                           STUDENT REGISTRATION                         " << endl;
+    cout << "========================================================================" << endl;
     cout << "Enter username : ";
     cin.ignore();
     getline(cin, username);
@@ -76,7 +91,6 @@ char function::registration() {
     string checkIC_numQuerry = "select * from student where ic_num = '" + ic_num + "'";
     const char* checkIC_num = checkIC_numQuerry.c_str();
     qstate = mysql_query(conn, checkIC_num);
-
     if (!qstate) {
 
         res = mysql_store_result(conn);
@@ -106,12 +120,12 @@ char function::registration() {
                     return c;
             }
             else {
-                cout << "Query Execution Problem! 222" << mysql_errno(conn) << endl;
+                cout << "Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
             }
         }
     }
     else {
-        cout << "Query Execution Problem! 111" << mysql_errno(conn) << endl;
+        cout << "Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
     }
 }
 //End of student register function
@@ -125,9 +139,9 @@ int function::studentLogin() {
     string ic_num, password = "";
     char ch;
 
-    cout << "========================================" << endl;
-    cout << "               STUDENT LOGIN            " << endl;
-    cout << "========================================" << endl;
+    cout << "========================================================================" << endl;
+    cout << "                              STUDENT LOGIN                             " << endl;
+    cout << "========================================================================" << endl;
     cout << "Enter IC number ( without - ) : ";
     cin >> ic_num;
 
@@ -176,7 +190,7 @@ int function::studentLogin() {
                 }
             }
             else {
-                cout << "Query Execution Problem!" << mysql_errno(conn) << endl;
+                cout << "Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
             }
         }
         else if (ch == 8) { //8 is BACKSPACE key in ASCII
@@ -196,5 +210,17 @@ int function::studentLogin() {
 
 
 void function::studentMenu() {
+
+    cout << "========================================================================" << endl;
+    cout << "                              STUDENT MENU                             " << endl;
+    cout << "========================================================================" << endl;
     cout << "STUDENT PUNYA MENU" << endl;
+}
+
+void function::adminMenu() {
+    
+    cout << "========================================================================" << endl;
+    cout << "                               ADMIN LOGIN                              " << endl;
+    cout << "========================================================================" << endl;
+    cout << "ADMIN PUNYA MENU" << endl;
 }

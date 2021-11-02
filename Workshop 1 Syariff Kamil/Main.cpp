@@ -8,7 +8,7 @@
 #include <string>
 #include <mysql.h>
 #include "function.h" // functions
-#include "menuSelection.h" // menu arrow keys selection function header
+#include "arrowKeySelection.h" // menu arrow keys selection function header
 
 using namespace std;
 
@@ -17,7 +17,8 @@ int main() {
     HWND console = GetConsoleWindow();
     RECT r;
     GetWindowRect(console, &r); //stores the console's current dimensions
-    MoveWindow(console, r.left, r.top, 870, 800, TRUE); // 870 width, 800 height (only looks good on 24 inch monitor)
+    MoveWindow(console, r.left, r.top, 870, 800, TRUE); // 870 width, 800 height
+    system("color 0f"); //0-black bg, f- white text
     //end of fixed console size
 
     // Call Methods
@@ -25,19 +26,18 @@ int main() {
     // Call Methods End
 
     function f;
-    menuSelection select;
+    arrowKeySelection arrowKey;
     int selection = 0,count = 0;
     char choice;
 
-    cout << endl << ifstream("interface/Homepage.txt").rdbuf() << endl;
-    selection = select.mainMenu();
+    f.mainMenu(selection);
     if (selection == 1) {
-        count = f.studentLogin();
-        if (count == 3) {
-            main();
-        }
-        else if (count < 3) {
+        selection=arrowKey.loginSelection();
+        if (selection == 1) {
             f.studentMenu();
+        }
+        else if (selection == 2) {
+            f.adminMenu();
         }
     }
     else if (selection == 2) {
@@ -52,6 +52,7 @@ int main() {
     else if (selection == 3) {
         return 0;
     }
+
 
     return 0;
 }

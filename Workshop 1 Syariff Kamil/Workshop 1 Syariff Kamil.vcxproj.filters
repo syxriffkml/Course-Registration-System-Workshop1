@@ -21,7 +21,7 @@
     <ClCompile Include="function.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="menuSelection.cpp">
+    <ClCompile Include="arrowKeySelection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -29,7 +29,7 @@
     <ClInclude Include="function.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="menuSelection.h">
+    <ClInclude Include="arrowKeySelection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
