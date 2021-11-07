@@ -9,6 +9,7 @@ class arrowKeySelection {
 		void gotoxy(int x, int y);
 		int mainMenuSelection();
 		int loginSelection();
+		int studentPageSelection();
 };
 
 #endif 
