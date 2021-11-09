@@ -1,4 +1,5 @@
 #include <iostream>
+#include<sstream>
 #include <fstream> //text file (mainly for interface)
 #include <cstdlib> //standard library
 #include <conio.h> //using getch
@@ -7,6 +8,7 @@
 #include <mysql.h>
 #include "function.h" // functions header
 #include "arrowKeySelection.h" // menu arrow keys selection function header
+
 
 #include <limits> //just for error(when user input alphabet and numbers) -  cin.ignore(numeric_limits<streamsize>::max(), '\n');
 #undef max; //just for error(when user input alphabet and numbers) -   cin.ignore(numeric_limits<streamsize>::max(), '\n');
@@ -45,18 +47,22 @@ int main() {
             }
             do {// STUDENT MENU LOOP
 
+
+
                 f.studentMenu();
                 studentSelection = arrowKey.studentPageSelection();
                 if (studentSelection == 1) {
                     //function later on
-                    cout << "Wanna go back to student menu ? press 8 for yes : ";
+                    cout << "\nWanna go back to student menu ? press 8 for yes : ";
                     cin >> backToStudentMenu;
+                    system("cls");
                 }else if (studentSelection == 2) {
-                    //function later on
-                    cout << "Wanna go back to student menu ? press 8 for yes : ";
+                    f.studentDetail();
+                    cout << "\nWanna go back to student menu ? press 8 for yes : ";
                     cin >> backToStudentMenu;
+                    system("cls");
                 }else if (studentSelection == 3) {
-                    //function later on
+                    f.editStudentDisplay();
                 }else if (studentSelection == 8) { // "logout"
                     goto start;
                 }

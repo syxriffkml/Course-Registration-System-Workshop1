@@ -1,4 +1,5 @@
 #include <iostream>
+#include<sstream>
 #include <windows.h>
 #include <conio.h> //_getch()
 #include <iomanip> //setw()
@@ -259,3 +260,201 @@ int arrowKeySelection::studentPageSelection() {
         return counter;
     }
 }
+
+int arrowKeySelection::maritalStatusSelection() {
+
+    int Set[] = { 12,7,7,7 }; // DEFAULT COLORS
+    int counter = 1;
+    char key;
+
+    for (int i = 0;;) {
+        gotoxy(25, 16);
+        color(Set[0]);
+        cout << "1. Single";
+
+        gotoxy(37, 16);
+        color(Set[1]);
+        cout << "2. Married";
+
+        gotoxy(50, 16);
+        color(Set[2]);
+        cout << "3. Widowed";
+
+        gotoxy(63, 16);
+        color(Set[3]);
+        cout << "4. Divorce";
+
+        key = _getch();
+        if (key == 75 && (counter >= 2 && counter <= 4)) { counter--; } //75 for arrow left key
+        if (key == 77 && (counter >= 1 && counter <= 3)) { counter++; }  //77 for arrow right key
+
+        if (key == '\r')//carriage return
+        {   // if enter is click and highlight is on 1 the program will run the code here
+            if (counter == 1) {
+                break;
+            }
+            if (counter == 2) {
+                break;
+            }
+            if (counter == 3) {
+                break;
+            }
+            if (counter == 4) {
+                break;
+            }
+        }
+        //default white
+        Set[0] = 7;
+        Set[1] = 7;
+        Set[2] = 7;
+        Set[3] = 7;
+
+        //set colours during selection
+        if (counter == 1) { Set[0] = 12; }
+        if (counter == 2) { Set[1] = 12; }
+        if (counter == 3) { Set[2] = 12; }
+        if (counter == 4) { Set[3] = 12; }
+    }
+
+    if (counter == 1) {
+        return counter;
+    }
+    else if (counter == 2) {
+        return counter;
+    }
+    else if (counter == 3) {
+        return counter;
+    }
+    else if (counter == 4) {
+        return counter;
+    }
+}
+
+int arrowKeySelection::eduLevelSelection() {
+
+    int Set[] = { 12,7,7,7,7 }; // DEFAULT COLORS
+    int counter = 1;
+    char key;
+
+    for (int i = 0;;) {
+        gotoxy(31, 18);
+        color(Set[0]);
+        cout << "1. Diploma";
+
+        gotoxy(44, 18);
+        color(Set[1]);
+        cout << "2. STPM";
+
+        gotoxy(54, 18);
+        color(Set[2]);
+        cout << "3. Matriculation";
+
+        gotoxy(73, 18);
+        color(Set[3]);
+        cout << "4. Foundation";
+
+        gotoxy(89, 18);
+        color(Set[4]);
+        cout << "5. A-Level";
+
+        key = _getch();
+        if (key == 75 && (counter >= 2 && counter <= 5)) { counter--; } //75 for arrow left key
+        if (key == 77 && (counter >= 1 && counter <= 4)) { counter++; }  //77 for arrow right key
+
+        if (key == '\r')//carriage return
+        {   // if enter is click and highlight is on 1 the program will run the code here
+            if (counter == 1) {
+                break;
+            }
+            if (counter == 2) {
+                break;
+            }
+            if (counter == 3) {
+                break;
+            }
+            if (counter == 4) {
+                break;
+            }
+            if (counter == 5) {
+                break;
+            }
+        }
+        //default white
+        Set[0] = 7;
+        Set[1] = 7;
+        Set[2] = 7;
+        Set[3] = 7;
+        Set[4] = 7;
+
+        //set colours during selection
+        if (counter == 1) { Set[0] = 12; }
+        if (counter == 2) { Set[1] = 12; }
+        if (counter == 3) { Set[2] = 12; }
+        if (counter == 4) { Set[3] = 12; }
+        if (counter == 5) { Set[4] = 12; }
+    }
+
+    if (counter == 1) {
+        return counter;
+    }
+    else if (counter == 2) {
+        return counter;
+    }
+    else if (counter == 3) {
+        return counter;
+    }
+    else if (counter == 4) {
+        return counter;
+    }
+    else if (counter == 5) {
+        return counter;
+    }
+}
+
+
+//PENTINGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG
+int arrowKeySelection::resetOrProceed() {
+
+    int Set[] = { 7,12 }; // DEFAULT COLORS
+    int counter = 2;
+    char key;
+
+    for (int i = 0;;) {
+        gotoxy(26, 25);
+        color(Set[0]);
+        cout << "1. Reset";
+
+        gotoxy(42, 25);
+        color(Set[1]);
+        cout << "2. Proceed";
+
+        key = _getch();
+        if (key == 75 && (counter >= 2 && counter <= 2)) { counter--; } //72 for arrow left key
+        if (key == 77 && (counter >= 1 && counter <= 1)) { counter++; }  //80 for arrow right key
+
+        if (key == '\r')//carriage return
+        {   // if enter is click and highlight is on 1 the program will run the code here
+            if (counter == 1) {
+                break;
+            }
+            if (counter == 2) {
+                break;
+            }
+        }
+        //default white
+        Set[0] = 7;
+        Set[1] = 7;
+
+        //set colours during selection
+        if (counter == 1) { Set[0] = 12; }
+        if (counter == 2) { Set[1] = 12; }
+    }
+
+    if (counter == 1) {
+        return counter;
+    }
+    else if (counter == 2) {
+        return counter;
+    }
+}
+//PENTINGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG

@@ -1,4 +1,6 @@
 ﻿#include <iostream>
+#include <iomanip>
+#include<sstream>
 #include <fstream> //text file (mainly for interface)
 #include <cstdlib> //standard library
 #include <conio.h> //using getch
@@ -19,7 +21,7 @@ MYSQL_ROW row;
 MYSQL_RES* res;
 // Global Variable End
 
-string stuID;
+string stuID,username;
 
 //Start of database connection function
 void function::ConnectionFunction() {
@@ -67,13 +69,13 @@ void function::mainMenu() {
     cout << "                         COURSE ADMISSION SYSTEM                        " << endl;
     cout << "                               -MAIN MENU-                              " << endl;
     cout << "========================================================================" << endl;
-    WriteInColor(11,"      +----------------------------------------------------------+\n"); //start here, the text color will be
-    WriteInColor(11,"      | INSTRUCTION : Move arrow keys (Up, Down, Left, Right) to |\n");
-    WriteInColor(11,"      | move the selection and press ENTER key to select         |\n");
-    WriteInColor(11,"      +----------------------------------------------------------+\n");
+    WriteInColor(11, "      +----------------------------------------------------------+\n"); //start here, the text color will be
+    WriteInColor(11, "      | INSTRUCTION : Move arrow keys (Up, Down, Left, Right) to |\n");
+    WriteInColor(11, "      | move the selection and press ENTER key to select         |\n");
+    WriteInColor(11, "      +----------------------------------------------------------+\n");
     WriteInColor(7, " "); // change back the next text colour to white
     //selection = arrowKey.mainMenuSelection(); 
-    
+
 }
 //end of main menu function
 
@@ -87,20 +89,20 @@ void function::registration() {
     cout << "========================================================================" << endl;
     cout << "                           STUDENT REGISTRATION                         " << endl;
     cout << "========================================================================" << endl;
-    cout << "Enter username : ";
+    cout << "\nEnter username : ";
     getline(cin, username);
 
-    cout << "Enter IC number ( without - ) : ";
+    cout << "\nEnter IC number ( without - ) : ";
     cin >> ic_num;
 
-    cout << "Enter gender (Male or Female) : ";
+    cout << "\nEnter gender (Male or Female) : ";
     cin.ignore();
     getline(cin, gender);
 
-    cout << "Enter email : ";
+    cout << "\nEnter email : ";
     getline(cin, email);
 
-    cout << "Enter password : ";
+    cout << "\nEnter password : ";
     getline(cin, password);
 
 
@@ -112,7 +114,7 @@ void function::registration() {
         res = mysql_store_result(conn);
         if (res->row_count == 1) {
 
-            cout << "IC number already exists. Press Enter to Try Again...\n";
+            cout << "\nIC number already exists. Press Enter to Try Again...\n";
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
             system("pause");
@@ -145,19 +147,19 @@ void function::registration() {
 
 //Start of student login function
 int function::studentLogin() {
-    
+
     int count = 0;
-    student_login:
-    string ic_num, password = "",studentPasswordDB;
+student_login:
+    string ic_num, password = "", studentPasswordDB, studentICnum;
     char ch;
 
     cout << "========================================================================" << endl;
     cout << "                              STUDENT LOGIN                             " << endl;
     cout << "========================================================================" << endl;
-    cout << "Enter IC number ( without - ) : ";
+    cout << "\nEnter IC number ( without - ) : ";
     cin >> ic_num;
 
-    cout << "Enter password : ";
+    cout << "\nEnter password : ";
     while (ch = _getch()) { //assign ASCII value to ch
         if (ch == 13) {  //13 is ENTER key in ASCII
 
@@ -170,10 +172,11 @@ int function::studentLogin() {
                 if (res->row_count == 1) { //
                     while (row = mysql_fetch_row(res)) {
                         stuID = row[0]; //ibarat $_SESSION dalam php la gitu (row[0] is row student id dalam database)
+                        studentICnum = row[2];  //row[1] for ic number
                         studentPasswordDB = row[5]; //row[5] for password
                     }
                 }
-                if (password == studentPasswordDB) {//password exaclty sama ngan database
+                if ((password == studentPasswordDB) && (ic_num == studentICnum)) {//password exaclty sama ngan database
                     system("cls");
                     cout << "CORRECT LOGIN!" << endl;
                     //cout << endl << ifstream("interface/CorrectLogin.txt").rdbuf() << endl << endl << endl << endl;
@@ -181,7 +184,7 @@ int function::studentLogin() {
                     system("cls");
                     return count = 0;
                 }
-                else if (password != studentPasswordDB) {
+                else if ((password != studentPasswordDB) && (ic_num != studentICnum)) {
                     ic_num = "";
                     password = "";
                     count++;
@@ -227,7 +230,7 @@ int function::studentLogin() {
 
 //start of student menu function
 void function::studentMenu() {
-    string username;
+
     string querry = "select username from student where student_id = '" + stuID + "'";
     const char* getUsername = querry.c_str();
     qstate = mysql_query(conn, getUsername);
@@ -241,11 +244,11 @@ void function::studentMenu() {
         }
         else {
             cout << "Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
-        }
-        cout << "========================================================================" << endl;
-        cout << "Welcome, user ";
-        WriteInColor(11, username + " " + stuID + "\n");//start here, the text color will be
-        WriteInColor(7," "); // change back the next text colour to white
+        } 
+        cout << "( Welcome, user ";
+        WriteInColor(11, username + " " + stuID);//start here, the text color will be
+        WriteInColor(7, " )\n"); // change back the next text colour to white
+        cout << "========================================================================" << endl;   
         cout << "                              STUDENT MENU                             " << endl;
         cout << "========================================================================" << endl;
         WriteInColor(11, "      +----------------------------------------------------------+\n"); //start here, the text color will be
@@ -257,12 +260,130 @@ void function::studentMenu() {
     else {
         cout << "Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
     }
-    
+
 }
 //end of student menu function
 
 
+//Start of student insert details function
+void function::studentDetail() {
 
+    startStudentDetail:
+    arrowKeySelection arrow;
+    int maritalSelection = 0, eduSelection = 0, workExperience = 0, resetOrProceed = 0;
+    string fullname, address, phoneNum, maritalStatus, eduLevel;
+
+    cout << "( Welcome, user ";
+    WriteInColor(11, username + " " + stuID);//start here, the text color will be
+    WriteInColor(7, " )\n"); // change back the next text colour to white
+    cout << "========================================================================" << endl;
+    cout << "                              STUDENT MENU                              " << endl;
+    cout << "                           -personal details-                           " << endl;
+    cout << "========================================================================" << endl;
+    WriteInColor(11, "      +----------------------------------------------------------+\n"); //start here, the text color will be
+    WriteInColor(11, "      | INSTRUCTION : Move arrow keys (Up, Down, Left, Right) to |\n");
+    WriteInColor(11, "      | move the selection and press ENTER key to select         |\n");
+    WriteInColor(11, "      +----------------------------------------------------------+\n");
+    WriteInColor(7, " "); // change back the next text colour to white
+
+    cout << "\nEnter fullname : ";
+    cin.ignore();
+    getline(cin, fullname);
+
+    cout << "\nEnter home address : ";
+    getline(cin, address);
+
+    cout << "\nEnter phone number ( without - ) : ";
+    getline(cin, phoneNum);
+
+    cout << "\nSelect martial_status : ";
+    maritalSelection = arrow.maritalStatusSelection();
+    if (maritalSelection == 1) {
+        maritalStatus = "Single";
+    }
+    else if (maritalSelection == 2) {
+        maritalStatus = "Married";
+    }
+    else if (maritalSelection == 3) {
+        maritalStatus = "Widowed";
+    }
+    else if (maritalSelection == 4) {
+        maritalStatus = "Divorce";
+    }
+    WriteInColor(7, " ");
+
+    cout << "\n\nSelect past education level : ";
+    eduSelection = arrow.eduLevelSelection();
+    if (eduSelection == 1) {
+        eduLevel = "Diploma";
+    }
+    else if (eduSelection == 2) {
+        eduLevel = "STPM";
+    }
+    else if (eduSelection == 3) {
+        eduLevel = "Matriculation";
+    }
+    else if (eduSelection == 4) {
+        eduLevel = "Foundation";
+    }
+    else if (eduSelection == 5) {
+        eduLevel = "A-Level";
+    }
+    WriteInColor(7, " ");
+
+    cout << "\n\nEnter work experience in years ( enter 0 if none ) : ";
+    cin >> workExperience;
+
+    cout << "\n\n\n" << setw(51) << "DO YOU WANT TO PROCEED ?";
+    resetOrProceed = arrow.resetOrProceed();
+    WriteInColor(7, " ");
+    if (resetOrProceed == 1) { //reset
+        system("cls");
+        goto startStudentDetail;
+    }
+    else if (resetOrProceed == 2) { //proceed 
+    //change int to string
+    stringstream streamWorkExp;
+    string sWorkExp;
+    streamWorkExp << workExperience;
+    streamWorkExp >> sWorkExp;
+    //change int to string
+
+    string stuDetailQuery = "insert into studentdetails (student_id,fullname, home_address, phone_num, marital_status, education_level, work_experience) values ('"
+        + stuID + "', '" + fullname + "', '" + address + "', '" + phoneNum + "', '" + maritalStatus + "', '" + eduLevel + "','" + sWorkExp + "')";
+    const char* insertStudentDetail = stuDetailQuery.c_str();
+    qstate = mysql_query(conn, insertStudentDetail);
+
+    if (!qstate) {
+        cout << endl << "\n\nYou have successfully entered your student details! ";
+        system("pause");
+        return;
+    }
+    else {
+        cout << "Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
+    }
+    }
+}
+//End of student insert details function
+
+
+void function::editStudentDisplay() {
+
+    cout << "( Welcome, user ";
+    WriteInColor(11, username + " " + stuID);//start here, the text color will be
+    WriteInColor(7, " )\n"); // change back the next text colour to white
+    cout << "========================================================================" << endl;
+    cout << "                              STUDENT MENU                              " << endl;
+    cout << "                           -personal details-                           " << endl;
+    cout << "========================================================================" << endl;
+    WriteInColor(11, "      +----------------------------------------------------------+\n"); //start here, the text color will be
+    WriteInColor(11, "      | INSTRUCTION : Move arrow keys (Up, Down, Left, Right) to |\n");
+    WriteInColor(11, "      | move the selection and press ENTER key to select         |\n");
+    WriteInColor(11, "      +----------------------------------------------------------+\n");
+    WriteInColor(7, " "); // change back the next text colour to white
+
+
+}
 
 
 
@@ -350,7 +471,7 @@ int function::adminLogin() {
 
 //start of admin menu function
 void function::adminMenu() {
-    
+
     cout << "========================================================================" << endl;
     cout << "                               ADMIN LOGIN                              " << endl;
     cout << "========================================================================" << endl;

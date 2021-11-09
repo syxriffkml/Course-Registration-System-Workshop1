@@ -11,8 +11,14 @@ class function {
 		void registration();
 		int studentLogin();
 		void studentMenu();
-		int adminLogin();
+		void studentDetail();
+		void editStudentDisplay(); 
+		int adminLogin(); //ADMIN
 		void adminMenu();
 };
 
 #endif 
+
+
+
+
