@@ -458,3 +458,48 @@ int arrowKeySelection::resetOrProceed() {
     }
 }
 //PENTINGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG
+
+int arrowKeySelection::editStuDetailSelection() {
+
+    int Set[] = { 7,12 }; // DEFAULT COLORS
+    int counter = 2;
+    char key;
+
+    for (int i = 0;;) {
+        gotoxy(26, 38);
+        color(Set[0]);
+        cout << "1. Back";
+
+        gotoxy(42, 38);
+        color(Set[1]);
+        cout << "2. Edit";
+
+        key = _getch();
+        if (key == 75 && (counter >= 2 && counter <= 2)) { counter--; } //72 for arrow left key
+        if (key == 77 && (counter >= 1 && counter <= 1)) { counter++; }  //80 for arrow right key
+
+        if (key == '\r')//carriage return
+        {   // if enter is click and highlight is on 1 the program will run the code here
+            if (counter == 1) {
+                break;
+            }
+            if (counter == 2) {
+                break;
+            }
+        }
+        //default white
+        Set[0] = 7;
+        Set[1] = 7;
+
+        //set colours during selection
+        if (counter == 1) { Set[0] = 12; }
+        if (counter == 2) { Set[1] = 12; }
+    }
+
+    if (counter == 1) {
+        return counter;
+    }
+    else if (counter == 2) {
+        return counter;
+    }
+}

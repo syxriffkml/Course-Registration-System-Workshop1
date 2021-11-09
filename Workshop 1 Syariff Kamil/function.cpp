@@ -278,7 +278,7 @@ void function::studentDetail() {
     WriteInColor(7, " )\n"); // change back the next text colour to white
     cout << "========================================================================" << endl;
     cout << "                              STUDENT MENU                              " << endl;
-    cout << "                           -personal details-                           " << endl;
+    cout << "                        -insert personal details-                       " << endl;
     cout << "========================================================================" << endl;
     WriteInColor(11, "      +----------------------------------------------------------+\n"); //start here, the text color will be
     WriteInColor(11, "      | INSTRUCTION : Move arrow keys (Up, Down, Left, Right) to |\n");
@@ -342,32 +342,36 @@ void function::studentDetail() {
         goto startStudentDetail;
     }
     else if (resetOrProceed == 2) { //proceed 
-    //change int to string
-    stringstream streamWorkExp;
-    string sWorkExp;
-    streamWorkExp << workExperience;
-    streamWorkExp >> sWorkExp;
-    //change int to string
+        //change int to string
+        stringstream streamWorkExp;
+        string sWorkExp;
+        streamWorkExp << workExperience;
+        streamWorkExp >> sWorkExp;
+        //change int to string
 
-    string stuDetailQuery = "insert into studentdetails (student_id,fullname, home_address, phone_num, marital_status, education_level, work_experience) values ('"
-        + stuID + "', '" + fullname + "', '" + address + "', '" + phoneNum + "', '" + maritalStatus + "', '" + eduLevel + "','" + sWorkExp + "')";
-    const char* insertStudentDetail = stuDetailQuery.c_str();
-    qstate = mysql_query(conn, insertStudentDetail);
+        string stuDetailQuery = "insert into studentdetails (student_id,fullname, home_address, phone_num, marital_status, education_level, work_experience) values ('"
+            + stuID + "', '" + fullname + "', '" + address + "', '" + phoneNum + "', '" + maritalStatus + "', '" + eduLevel + "','" + sWorkExp + "')";
+        const char* insertStudentDetail = stuDetailQuery.c_str();
+        qstate = mysql_query(conn, insertStudentDetail);
 
-    if (!qstate) {
-        cout << endl << "\n\nYou have successfully entered your student details! ";
-        system("pause");
-        return;
-    }
-    else {
-        cout << "Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
-    }
+        if (!qstate) {
+            cout << endl << "\n\nYou have successfully entered your student details! ";
+            system("pause");
+            return;
+        }
+        else {
+            cout << "Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
+        }
     }
 }
 //End of student insert details function
 
 
+//Start of student view/edit details
 void function::editStudentDisplay() {
+
+    arrowKeySelection arrow;
+    int edit = 0;
 
     cout << "( Welcome, user ";
     WriteInColor(11, username + " " + stuID);//start here, the text color will be
@@ -377,14 +381,91 @@ void function::editStudentDisplay() {
     cout << "                           -personal details-                           " << endl;
     cout << "========================================================================" << endl;
     WriteInColor(11, "      +----------------------------------------------------------+\n"); //start here, the text color will be
-    WriteInColor(11, "      | INSTRUCTION : Move arrow keys (Up, Down, Left, Right) to |\n");
-    WriteInColor(11, "      | move the selection and press ENTER key to select         |\n");
+    WriteInColor(11, "      | INSTRUCTION :                                            |\n");
+    WriteInColor(11, "      | (1) Move arrow keys (Up, Down, Left, Right) to move the  |\n");
+    WriteInColor(11, "      | selection and press ENTER key to select                  |\n");
+    WriteInColor(11, "      | (2) Only the details such as username, email, home       |\n");
+    WriteInColor(11, "      | address, phone number & marital status can be change     |\n");
     WriteInColor(11, "      +----------------------------------------------------------+\n");
     WriteInColor(7, " "); // change back the next text colour to white
 
+    string stuDetailQuery = "select * from student,studentdetails where student.student_id ='" + stuID + "' AND studentdetails.student_id = '" + stuID + "'"; //from 2 tables
+    const char* viewStudentDetail = stuDetailQuery.c_str();
+    qstate = mysql_query(conn, viewStudentDetail);
 
+    if (!qstate) {
+        res = mysql_store_result(conn);
+        if (res->row_count == 1) { 
+            while (row = mysql_fetch_row(res)) {
+                WriteInColor(7, "\n\n\n       Account Username : "); WriteInColor(11, row[1]);
+                WriteInColor(7, "\n\n       IC Number : "); WriteInColor(11, row[2]);
+                WriteInColor(7, "\n\n       Gender : "); WriteInColor(11, row[3]);
+                WriteInColor(7, "\n\n       Email Address : "); WriteInColor(11, row[4]);
+                WriteInColor(7, "\n\n       Full Name : "); WriteInColor(11, row[8]);
+                WriteInColor(7, "\n\n       Home Address : "); WriteInColor(11, row[9]);
+                WriteInColor(7, "\n\n       Phone Number : "); WriteInColor(11, row[10]);
+                WriteInColor(7, "\n\n       Marital Status : "); WriteInColor(11, row[11]);
+                WriteInColor(7, "\n\n       Education Level : "); WriteInColor(11, row[12]);
+                WriteInColor(7, "\n\n       Work Experience : "); WriteInColor(11, row[13]);
+                WriteInColor(7, "\n"); // change back the next text colour to white
+
+                cout << "\n\n\n" << setw(58) << "DO YOU WANT TO EDIT THE STUDENT DETAILS ?";
+                edit = arrow.editStuDetailSelection();
+                WriteInColor(7, " ");
+                if (edit == 1) {
+                    return;
+                }
+                else if (edit == 2) {
+                    system("cls");
+                    editDetail:
+                    string newUsername, newEmail, newHomeAddress, newPhoneNum, newMaritalStatus;
+                    cout << "( Welcome, user ";
+                    WriteInColor(11, username + " " + stuID);//start here, the text color will be
+                    WriteInColor(7, " )\n"); // change back the next text colour to white
+                    cout << "========================================================================" << endl;
+                    cout << "                              STUDENT MENU                              " << endl;
+                    cout << "                        -edit personal details-                         " << endl;
+                    cout << "========================================================================" << endl;
+
+                    WriteInColor(7, "\n\n\n       Account Username : "); WriteInColor(11, row[1]);
+                    cout << "\n" << setw(25) << "Account Username : "; cin >> newUsername;
+                    
+                    WriteInColor(7, "\n\n       Email Address : "); WriteInColor(11, row[4]);
+                    cout << "\n" << setw(25) << "Email Address : "; cin >> newEmail;
+
+                    WriteInColor(7, "\n\n       Home Address : "); WriteInColor(11, row[9]);
+                    cout << "\n" << setw(25) << "HomeAddress : "; cin >> newHomeAddress;
+
+                    WriteInColor(7, "\n\n       Phone Number : "); WriteInColor(11, row[10]);
+                    cout << "\n" << setw(25) << "Phone Number : "; cin >> newPhoneNum;
+
+                    WriteInColor(7, "\n\n       Marital Status : "); WriteInColor(11, row[11]);
+                    cout << "\n" << setw(25) << "Marital Status : "; cin >> newMaritalStatus;
+                    WriteInColor(7, "\n"); // change back the next text colour to white
+
+                    cout << "\n\n\n" << setw(51) << "DO YOU WANT TO PROCEED ?";
+                    int resetOrProceed = arrow.resetOrProceed();
+                    WriteInColor(7, " ");
+                    if (resetOrProceed == 1) { //reset
+                        system("cls");
+                        goto editDetail;
+                    }
+                    else if (resetOrProceed == 2) { //proceed edit
+                        //sql statement alter table
+                    }
+                }
+            }
+        }
+
+        cout << endl << "\n\nYou have successfully entered your student details! ";
+        system("pause");
+        return;
+    }
+    else {
+        cout << "Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
+    }
 }
-
+//End of student view/edit details
 
 
 //Start of admin login function (TABLE NOT CREATED YET)

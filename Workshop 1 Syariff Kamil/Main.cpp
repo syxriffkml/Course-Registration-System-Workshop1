@@ -56,13 +56,16 @@ int main() {
                     cout << "\nWanna go back to student menu ? press 8 for yes : ";
                     cin >> backToStudentMenu;
                     system("cls");
-                }else if (studentSelection == 2) {
+                }else if (studentSelection == 2) { //insert personal detail
                     f.studentDetail();
                     cout << "\nWanna go back to student menu ? press 8 for yes : ";
                     cin >> backToStudentMenu;
                     system("cls");
-                }else if (studentSelection == 3) {
+                }else if (studentSelection == 3) { // view and edit personal details
                     f.editStudentDisplay();
+                    cout << "\nWanna go back to student menu ? press 8 for yes : ";
+                    cin >> backToStudentMenu;
+                    system("cls");
                 }else if (studentSelection == 8) { // "logout"
                     goto start;
                 }
