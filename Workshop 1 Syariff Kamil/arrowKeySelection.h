@@ -12,7 +12,7 @@ class arrowKeySelection {
 		int studentPageSelection();
 		int maritalStatusSelection();
 		int eduLevelSelection();
-		int resetOrProceed();
+		int resetOrProceed(int& check);
 		int editStuDetailSelection();
 };
 

@@ -9,7 +9,7 @@
 #include "function.h" // functions header
 #include "arrowKeySelection.h" // menu arrow keys selection function header
 
-
+//buang later kalau tak pakai
 #include <limits> //just for error(when user input alphabet and numbers) -  cin.ignore(numeric_limits<streamsize>::max(), '\n');
 #undef max; //just for error(when user input alphabet and numbers) -   cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
@@ -46,31 +46,26 @@ int main() {
                 goto start;
             }
             do {// STUDENT MENU LOOP
-
-
-
                 f.studentMenu();
                 studentSelection = arrowKey.studentPageSelection();
                 if (studentSelection == 1) {
                     //function later on
-                    cout << "\nWanna go back to student menu ? press 8 for yes : ";
+                    cout << "\nPress 8 to go back to student menu : ";
                     cin >> backToStudentMenu;
                     system("cls");
                 }else if (studentSelection == 2) { //insert personal detail
                     f.studentDetail();
-                    cout << "\nWanna go back to student menu ? press 8 for yes : ";
+                    cout << "\nPress 8 to go back to student menu : ";
                     cin >> backToStudentMenu;
                     system("cls");
                 }else if (studentSelection == 3) { // view and edit personal details
                     f.editStudentDisplay();
-                    cout << "\nWanna go back to student menu ? press 8 for yes : ";
+                    cout << "\nPress 8 to go back to student menu : ";
                     cin >> backToStudentMenu;
                     system("cls");
                 }else if (studentSelection == 8) { // "logout"
                     goto start;
                 }
-
-
             } while (backToStudentMenu == 8);
         }
         else if (loginType == 2) { //ADMIN LOGIN (TABLE NOT CREATED YET SO CAN'T LOGIN)

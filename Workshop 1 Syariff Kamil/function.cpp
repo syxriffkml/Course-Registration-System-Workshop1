@@ -270,7 +270,7 @@ void function::studentDetail() {
 
     startStudentDetail:
     arrowKeySelection arrow;
-    int maritalSelection = 0, eduSelection = 0, workExperience = 0, resetOrProceed = 0;
+    int maritalSelection = 0, eduSelection = 0, workExperience = 0, resetOrProceed = 0, check = 1; //check 2 for add student detail 
     string fullname, address, phoneNum, maritalStatus, eduLevel;
 
     cout << "( Welcome, user ";
@@ -335,8 +335,10 @@ void function::studentDetail() {
     cin >> workExperience;
 
     cout << "\n\n\n" << setw(51) << "DO YOU WANT TO PROCEED ?";
-    resetOrProceed = arrow.resetOrProceed();
+    resetOrProceed = arrow.resetOrProceed(check);
+    check = 0; //reset check
     WriteInColor(7, " ");
+
     if (resetOrProceed == 1) { //reset
         system("cls");
         goto startStudentDetail;
@@ -370,6 +372,8 @@ void function::studentDetail() {
 //Start of student view/edit details
 void function::editStudentDisplay() {
 
+    cin.ignore();
+    viewDetail:
     arrowKeySelection arrow;
     int edit = 0;
 
@@ -409,15 +413,18 @@ void function::editStudentDisplay() {
                 WriteInColor(7, "\n\n       Work Experience : "); WriteInColor(11, row[13]);
                 WriteInColor(7, "\n"); // change back the next text colour to white
 
+                
                 cout << "\n\n\n" << setw(58) << "DO YOU WANT TO EDIT THE STUDENT DETAILS ?";
                 edit = arrow.editStuDetailSelection();
                 WriteInColor(7, " ");
                 if (edit == 1) {
-                    return;
+                    return; 
                 }
-                else if (edit == 2) {
-                    system("cls");
+                else if (edit == 2) {   
+                    
+                    system("cls");                   
                     editDetail:
+                    int check = 2; //check 2 for edit student detail 
                     string newUsername, newEmail, newHomeAddress, newPhoneNum, newMaritalStatus;
                     cout << "( Welcome, user ";
                     WriteInColor(11, username + " " + stuID);//start here, the text color will be
@@ -426,46 +433,74 @@ void function::editStudentDisplay() {
                     cout << "                              STUDENT MENU                              " << endl;
                     cout << "                        -edit personal details-                         " << endl;
                     cout << "========================================================================" << endl;
-
-                    WriteInColor(7, "\n\n\n       Account Username : "); WriteInColor(11, row[1]);
-                    cout << "\n" << setw(25) << "Account Username : "; cin >> newUsername;
                     
-                    WriteInColor(7, "\n\n       Email Address : "); WriteInColor(11, row[4]);
-                    cout << "\n" << setw(25) << "Email Address : "; cin >> newEmail;
+                    WriteInColor(7, "\n\n\n       Account Username : "); WriteInColor(11, row[1]);  WriteInColor(7, " ");
+                    cout << "\n" << setw(26) << "Account Username : ";   
+                    //cin.ignore();
+                    getline(cin, newUsername);
+                    
+                    WriteInColor(7, "\n\n       Email Address : "); WriteInColor(11, row[4]);  WriteInColor(7, " ");
+                    cout << "\n" << setw(23) << "Email Address : "; 
+                    getline(cin, newEmail);
 
-                    WriteInColor(7, "\n\n       Home Address : "); WriteInColor(11, row[9]);
-                    cout << "\n" << setw(25) << "HomeAddress : "; cin >> newHomeAddress;
+                    WriteInColor(7, "\n\n       Home Address : "); WriteInColor(11, row[9]);  WriteInColor(7, " ");
+                    cout << "\n" << setw(22) << "Home Address : "; 
+                    getline(cin, newHomeAddress);
 
-                    WriteInColor(7, "\n\n       Phone Number : "); WriteInColor(11, row[10]);
-                    cout << "\n" << setw(25) << "Phone Number : "; cin >> newPhoneNum;
+                    WriteInColor(7, "\n\n       Phone Number : "); WriteInColor(11, row[10]); WriteInColor(7, " ");
+                    cout << "\n" << setw(22) << "Phone Number : "; 
+                    getline(cin, newPhoneNum);
 
-                    WriteInColor(7, "\n\n       Marital Status : "); WriteInColor(11, row[11]);
-                    cout << "\n" << setw(25) << "Marital Status : "; cin >> newMaritalStatus;
+                    WriteInColor(7, "\n\n       Marital Status : "); WriteInColor(11, row[11]); WriteInColor(7, " ");
+                    cout << "\n" << setw(24) << "Marital Status : "; 
+                    getline(cin, newMaritalStatus);
                     WriteInColor(7, "\n"); // change back the next text colour to white
 
                     cout << "\n\n\n" << setw(51) << "DO YOU WANT TO PROCEED ?";
-                    int resetOrProceed = arrow.resetOrProceed();
+                    int resetOrProceed = arrow.resetOrProceed(check); //align text
+                    check = 0; //reset check
                     WriteInColor(7, " ");
+
                     if (resetOrProceed == 1) { //reset
                         system("cls");
-                        goto editDetail;
+                        goto editDetail; 
                     }
                     else if (resetOrProceed == 2) { //proceed edit
-                        //sql statement alter table
+                        username = newUsername;
+                        string updateDetailquery = "update student,studentdetails set student.username = '" + newUsername + "', student.email = '"
+                            + newEmail + "', studentdetails.home_address = '" + newHomeAddress + "', studentdetails.phone_num = '" 
+                            + newPhoneNum + "', studentdetails.marital_status = '" + newMaritalStatus + "' where student.student_id ='" 
+                            + stuID + "' AND studentdetails.student_id = '" + stuID + "'";
+                        const char* q = updateDetailquery.c_str();
+                        qstate = mysql_query(conn, q);
+                        if (!qstate)
+                        {
+                            cout << "\n\nYour student details are successfully updated" << endl << endl;
+                            system("pause");
+                            system("cls");
+                            goto viewDetail;
+                        }
+                        else
+                        {
+                            cout << "Update Failed! MySQL Error #" << mysql_errno(conn) << endl;
+                        }
                     }
                 }
             }
         }
-
-        cout << endl << "\n\nYou have successfully entered your student details! ";
-        system("pause");
-        return;
     }
     else {
         cout << "Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
     }
 }
 //End of student view/edit details
+
+
+
+
+
+
+
 
 
 //Start of admin login function (TABLE NOT CREATED YET)

@@ -413,21 +413,33 @@ int arrowKeySelection::eduLevelSelection() {
 
 
 //PENTINGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG
-int arrowKeySelection::resetOrProceed() {
+int arrowKeySelection::resetOrProceed(int& check) {
 
     int Set[] = { 7,12 }; // DEFAULT COLORS
     int counter = 2;
     char key;
 
     for (int i = 0;;) {
-        gotoxy(26, 25);
-        color(Set[0]);
-        cout << "1. Reset";
 
-        gotoxy(42, 25);
-        color(Set[1]);
-        cout << "2. Proceed";
+        if (check == 1) { //check 1 for add student details
+            gotoxy(26, 26);
+            color(Set[0]);
+            cout << "1. Reset";
 
+            gotoxy(42, 26);
+            color(Set[1]);
+            cout << "2. Proceed";
+        }
+        if (check == 2) { //check 2 for edit student details
+            gotoxy(26, 32);
+            color(Set[0]);
+            cout << "1. Reset";
+
+            gotoxy(42, 32);
+            color(Set[1]);
+            cout << "2. Proceed";
+        }
+        
         key = _getch();
         if (key == 75 && (counter >= 2 && counter <= 2)) { counter--; } //72 for arrow left key
         if (key == 77 && (counter >= 1 && counter <= 1)) { counter++; }  //80 for arrow right key
@@ -466,11 +478,11 @@ int arrowKeySelection::editStuDetailSelection() {
     char key;
 
     for (int i = 0;;) {
-        gotoxy(26, 38);
+        gotoxy(26, 39);
         color(Set[0]);
         cout << "1. Back";
 
-        gotoxy(42, 38);
+        gotoxy(42, 39);
         color(Set[1]);
         cout << "2. Edit";
 
