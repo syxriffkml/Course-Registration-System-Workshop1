@@ -1,16 +1,16 @@
 ﻿#include <iostream>
 #include <iomanip>
-#include<sstream>
-#include <fstream> //text file (mainly for interface)
-#include <cstdlib> //standard library
+#include <sstream>
+//#include <cstdlib> //standard library
 #include <conio.h> //using getch
 #include <windows.h> //windows library
-#include <limits> //just for error(when user input alphabet and numbers) -  cin.ignore(numeric_limits<streamsize>::max(), '\n');
-#undef max; //just for error(when user input alphabet and numbers) -   cin.ignore(numeric_limits<streamsize>::max(), '\n');
 #include <string>
 #include <mysql.h>
 #include "function.h" // functions
 #include "arrowKeySelection.h" // menu arrow keys selection function header
+
+#include <limits> //just for error(when user input alphabet and numbers) -  cin.ignore(numeric_limits<streamsize>::max(), '\n');
+#undef max; //just for error(when user input alphabet and numbers) -   cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
 using namespace std;
 
@@ -19,9 +19,11 @@ int qstate;
 MYSQL* conn;
 MYSQL_ROW row;
 MYSQL_RES* res;
+
+string stuID, username, subjectID;
 // Global Variable End
 
-string stuID,username;
+
 
 //Start of database connection function
 void function::ConnectionFunction() {
@@ -78,7 +80,6 @@ void function::mainMenu() {
 
 }
 //end of main menu function
-
 
 
 //Start of student register function
@@ -178,7 +179,10 @@ student_login:
                 }
                 if ((password == studentPasswordDB) && (ic_num == studentICnum)) {//password exaclty sama ngan database
                     system("cls");
-                    cout << "CORRECT LOGIN!" << endl;
+                    cout << "========================================================================" << endl;
+                    cout << "                              STUDENT LOGIN                             " << endl;
+                    cout << "========================================================================" << endl;
+                    cout << "\nCORRECT LOGIN!" << endl;
                     //cout << endl << ifstream("interface/CorrectLogin.txt").rdbuf() << endl << endl << endl << endl;
                     system("pause");
                     system("cls");
@@ -191,7 +195,10 @@ student_login:
                     if (count == 3) { //if student unable to login 3 times, the program will go back to main()
                         system("cls");
                         Beep(1000, 500);
-                        cout << "ERROR, INCORRECT IC NUMBER or PASSWORD\nYOU WILL GO BACK TO MAIN MENU" << endl;
+                        cout << "========================================================================" << endl;
+                        cout << "                              STUDENT LOGIN                             " << endl;
+                        cout << "========================================================================" << endl;
+                        cout << "\nERROR, INCORRECT IC NUMBER or PASSWORD\nYOU WILL GO BACK TO MAIN MENU" << endl;
                         //cout << endl << ifstream("interface/ErrorLogin.txt").rdbuf() << endl << endl << endl << endl;
                         system("pause");
                         system("cls");
@@ -200,7 +207,10 @@ student_login:
                     else { //if student unable to login, the program will go back to login page again()
                         system("cls");
                         Beep(1000, 500);
-                        cout << "ERROR, INCORRECT IC NUMBER or PASSWORD" << endl;
+                        cout << "========================================================================" << endl;
+                        cout << "                              STUDENT LOGIN                             " << endl;
+                        cout << "========================================================================" << endl;
+                        cout << "\nERROR, INCORRECT IC NUMBER or PASSWORD" << endl;
                         //cout << endl << ifstream("interface/ErrorLogin.txt").rdbuf() << endl << endl << endl << endl;
                         system("pause");
                         system("cls");
@@ -496,6 +506,237 @@ void function::editStudentDisplay() {
 //End of student view/edit details
 
 
+//Start of Displaying list of Faculty and Courses (Student)
+void function::displayFacultyAndCourses() {
+
+    arrowKeySelection arrow;
+    int facultyselect = 0;
+
+    cout << "( Welcome, user ";
+    WriteInColor(11, username + " " + stuID);//start here, the text color will be
+    WriteInColor(7, " )\n"); // change back the next text colour to white
+    cout << "=======================================================================================================" << endl;
+    cout << "                                               STUDENT MENU                                            " << endl;
+    cout << "                                            -list of faculties-                                        " << endl;
+    cout << "=======================================================================================================" << endl;
+    WriteInColor(11, "      +----------------------------------------------------------+\n"); //start here, the text color will be
+    WriteInColor(11, "      | INSTRUCTION : Move arrow keys (Up, Down, Left, Right) to |\n");
+    WriteInColor(11, "      | move the selection and press ENTER key to select         |\n");
+    WriteInColor(11, "      +----------------------------------------------------------+\n");
+    WriteInColor(7, " "); // change back the next text colour to white
+
+
+    facultyselect = arrow.facultySelection(); //arrow selection faculty, then cls
+    string fs = to_string(facultyselect); // change int to string
+
+    cout << "( Welcome, user ";
+    WriteInColor(11, username + " " + stuID);//start here, the text color will be
+    WriteInColor(7, " )\n"); // change back the next text colour to white
+    cout << "=======================================================================================================" << endl;
+    cout << "                                               STUDENT MENU                                            " << endl;
+    cout << "                                             -list of courses-                                         " << endl;
+    cout << "=======================================================================================================" << endl << endl;
+
+    string facultyQuery = "select * from courses where faculty_id = '" + fs + "'";
+    const char* fQuery = facultyQuery.c_str();
+    qstate = mysql_query(conn, fQuery);
+
+    if (!qstate) {
+        res = mysql_store_result(conn);
+        while (row = mysql_fetch_row(res)) {
+            cout << "Course Code : " << row[2] << setw(20) << "Course Name : " << row[3] << endl;
+        }
+    }
+    else {
+        cout << "Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
+    }
+}
+//End of Displaying list of Faculty and Courses (Student)
+
+void function::addGradesMenu() {
+    cout << "( Welcome, user ";
+    WriteInColor(11, username + " " + stuID);//start here, the text color will be
+    WriteInColor(7, " )\n"); // change back the next text colour to white
+    cout << "=======================================================================================================" << endl;
+    cout << "                                               STUDENT MENU                                            " << endl;
+    cout << "                                               -add grades-                                            " << endl;
+    cout << "=======================================================================================================" << endl;
+    WriteInColor(11, "      +----------------------------------------------------------+\n"); //start here, the text color will be blue
+    WriteInColor(11, "      | INSTRUCTION : Move arrow keys (Up, Down, Left, Right) to |\n");
+    WriteInColor(11, "      | move the selection and press ENTER key to select         |\n");
+    WriteInColor(11, "      +----------------------------------------------------------+\n\n");
+
+    WriteInColor(11, "      +----------------------------------------------------------+\n"); //start here, the text color will be
+    WriteInColor(11, "      | INSTRUCTION :                                            |\n");
+    WriteInColor(11, "      | (1) Move arrow keys (Up, Down, Left, Right) to move the  |\n");
+    WriteInColor(11, "      | selection and press ENTER key to select                  |\n");
+    WriteInColor(11, "      | (2) Make sure the information you add is CORRECT!        |\n");
+    WriteInColor(11, "      +----------------------------------------------------------+\n");
+
+    WriteInColor(11, "      +-------------------+\n"); //start here, the text color will be blue
+    WriteInColor(11, "      |    A  = 4.00      |\n");
+    WriteInColor(11, "      |    A- = 3.67      |\n");
+    WriteInColor(11, "      |    B+ = 3.33      |\n");
+    WriteInColor(11, "      |    B  = 3.00      |\n");
+    WriteInColor(11, "      |    B- = 2.67      |\n");
+    WriteInColor(11, "      |    C+ = 2.33      |\n");
+    WriteInColor(11, "      |    C  = 2.00      |\n");
+    WriteInColor(11, "      |    C- = 1.67      |\n");
+    WriteInColor(11, "      |    D  = 1.00      |\n");
+    WriteInColor(11, "      |    F  = 0.00      |\n");
+    WriteInColor(11, "      +-------------------+\n\n");
+    WriteInColor(7, ""); // change back the next text colour to white
+}
+
+//Start of add grades/cgpa function
+void function::addGrades() {
+
+    addGradesMenu();
+    string gradeLetter;
+    string subjectName;
+    double gpa = 0;
+    double cgpa = 0;
+    int option;
+    int totalSemester = 0;
+    double a=0, b=0;
+
+    do {//will loop if user didnt input number
+        if (cin.fail()) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
+        cout << "Enter total number of semester : ";
+        cin >> totalSemester;
+    } while (cin.fail());
+
+    for (int i = 0; i < totalSemester; i++) { //i means current semester
+        int currentSemester = i + 1;
+        double creditHour;
+        double gradePoints = 0;
+        double totGradePoints = 0;
+        double totCreditHour = 0;
+        cout << "Calculate cgpa for semester " << currentSemester << endl;
+        do {
+        again:
+            cout << "\nEnter the subject name : ";
+            cin.ignore();
+            getline(cin, subjectName);
+            cout << "Enter grade (example : B+) : ";
+            cin >> gradeLetter;
+            cin.ignore();
+            do {//will loop if user didnt input number
+                if (cin.fail()) {
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                }
+                cout << "Enter the course credit hour: ";
+                cin >> creditHour;
+            } while (cin.fail());
+   
+            if (gradeLetter == "a" || gradeLetter == "A") {
+                gradePoints = creditHour * 4.00;
+            }
+            else if (gradeLetter == "a-" || gradeLetter == "A-") {
+                gradePoints = creditHour * 3.67;
+            }
+            else if (gradeLetter == "b+" || gradeLetter == "B+") {
+                gradePoints = creditHour * 3.33;
+            }
+            else if (gradeLetter == "b" || gradeLetter == "B") {
+                gradePoints = creditHour * 3.00;
+            }
+            else if (gradeLetter == "b-" || gradeLetter == "B-") {
+                gradePoints = creditHour * 2.67;
+            }
+            else if (gradeLetter == "c+" || gradeLetter == "C+") {
+                gradePoints = creditHour * 2.33;
+            }
+            else if (gradeLetter == "c" || gradeLetter == "C") {
+                gradePoints = creditHour * 2.00;
+            }
+            else if (gradeLetter == "c-" || gradeLetter == "C-") {
+                gradePoints = creditHour * 1.67;
+            }
+            else if (gradeLetter == "d" || gradeLetter == "D") {
+                gradePoints = creditHour * 1.00;
+            }
+            else if (gradeLetter == "f" || gradeLetter == "F") {
+                gradePoints = creditHour * 0.00;
+            }
+            else {
+                cout << "Invaild Input..." << endl;
+                goto again;
+            }
+            
+            totGradePoints = totGradePoints + gradePoints;
+            totCreditHour = totCreditHour + creditHour;
+
+            //insert into database
+            string cS = to_string(currentSemester); // change int to string
+            string cH = to_string(creditHour); // change double to string
+            string insertSubjectQuery = "insert into subject (student_id, semester, subject_name, grade, credit_hour) values ('" 
+                + stuID + "', '" + cS + "', '" + subjectName + stuID + "', '" + gradeLetter + "', '" + cH + "')";
+            const char* insertSubject = insertSubjectQuery.c_str();
+            qstate = mysql_query(conn, insertSubject);
+            if (qstate)
+            {
+                cout << "Query Execution Problem!" << mysql_errno(conn) << endl;
+            }
+
+            cout << "Do you want to enter another grade (1 - Yes, 2 - no): ";
+            cin >> option;
+        } while (option == 1);
+
+        //kira GPA
+        gpa = totGradePoints / totCreditHour;
+        //kira CGPA
+        a = a + totGradePoints;
+        b = b + totCreditHour;
+        cgpa = a/b;
+
+        //fetch 
+        string fetchSubjectIDQuery = "select subject_id from subject where student_id = '" + stuID + "'";
+        const char* fetchSubjectID = fetchSubjectIDQuery.c_str();
+        qstate = mysql_query(conn, fetchSubjectID);
+        if (!qstate) {
+            res = mysql_store_result(conn);
+            while (row = mysql_fetch_row(res)) {
+                subjectID = row[0];
+            }
+        }
+        else {
+            cout << "Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
+        }
+
+        //insert into database
+        string gpaDB = to_string(gpa); // change int to string
+        string cgpaDB = to_string(cgpa); // change double to string
+        string insertResultQuery = "insert into result (subject_id, student_id, gpa, cgpa) values ('"+ subjectID + "', '" + stuID + "', '" + gpaDB + "', '" + cgpaDB + "')";
+        const char* insertResult = insertResultQuery.c_str();
+        qstate = mysql_query(conn, insertResult);
+        if (qstate)
+        {
+            cout << "Query Execution Problem!" << mysql_errno(conn) << endl;
+        }
+
+        system("cls");
+        addGradesMenu();
+        cout << "Student's GPA for semester " << currentSemester << " is : " << setprecision(3) << gpa << "\n";
+        cout << "Student's CGPA is : " << setprecision(3) << cgpa << "\n";
+        system("pause");
+        system("cls");
+        addGradesMenu();
+    }
+
+    
+
+    
+
+}
+//End of add grades/cgpa function
+
+
+
 
 
 
@@ -535,7 +776,10 @@ int function::adminLogin() {
                 }
                 if (password == studentPasswordDB) {//password exaclty sama ngan database
                     system("cls");
-                    cout << "CORRECT LOGIN!" << endl;
+                    cout << "========================================================================" << endl;
+                    cout << "                               ADMIN LOGIN                              " << endl;
+                    cout << "========================================================================" << endl;
+                    cout << "\nCORRECT LOGIN!" << endl;
                     //cout << endl << ifstream("interface/CorrectLogin.txt").rdbuf() << endl << endl << endl << endl;
                     system("pause");
                     system("cls");
@@ -548,7 +792,10 @@ int function::adminLogin() {
                     if (count == 3) { //if student unable to login 3 times, the program will go back to main()
                         system("cls");
                         Beep(1000, 500);
-                        cout << "ERROR, INCORRECT IC NUMBER or PASSWORD\nYOU WILL GO BACK TO MAIN MENU" << endl;
+                        cout << "========================================================================" << endl;
+                        cout << "                               ADMIN LOGIN                              " << endl;
+                        cout << "========================================================================" << endl;
+                        cout << "\nERROR, INCORRECT IC NUMBER or PASSWORD\nYOU WILL GO BACK TO MAIN MENU" << endl;
                         //cout << endl << ifstream("interface/ErrorLogin.txt").rdbuf() << endl << endl << endl << endl;
                         system("pause");
                         system("cls");
@@ -557,7 +804,10 @@ int function::adminLogin() {
                     else { //if student unable to login, the program will go back to login page again()
                         system("cls");
                         Beep(1000, 500);
-                        cout << "ERROR, INCORRECT IC NUMBER or PASSWORD" << endl;
+                        cout << "========================================================================" << endl;
+                        cout << "                               ADMIN LOGIN                              " << endl;
+                        cout << "========================================================================" << endl;
+                        cout << "\nERROR, INCORRECT IC NUMBER or PASSWORD" << endl;
                         //cout << endl << ifstream("interface/ErrorLogin.txt").rdbuf() << endl << endl << endl << endl;
                         system("pause");
                         system("cls");

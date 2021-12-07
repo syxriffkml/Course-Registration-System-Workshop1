@@ -9,11 +9,14 @@ class function {
 		void WriteInColor(unsigned short,string);
 		void mainMenu();
 		void registration();
-		int studentLogin();
+		int studentLogin(); //STUDENT PARTS
 		void studentMenu();
+		void displayFacultyAndCourses();
 		void studentDetail();
 		void editStudentDisplay(); 
-		int adminLogin(); //ADMIN
+		void addGradesMenu();
+		void addGrades();
+		int adminLogin(); //ADMIN PARTS
 		void adminMenu();
 };
 

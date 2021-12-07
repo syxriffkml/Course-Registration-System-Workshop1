@@ -3,7 +3,6 @@
 #include <windows.h>
 #include <conio.h> //_getch()
 #include <iomanip> //setw()
-#include <fstream> //text file (mainly for interface)
 #include "arrowKeySelection.h" // menu arrow keys selection function header
 
 using namespace std;
@@ -412,7 +411,7 @@ int arrowKeySelection::eduLevelSelection() {
 }
 
 
-//PENTINGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG
+//start of PENTINGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG
 int arrowKeySelection::resetOrProceed(int& check) {
 
     int Set[] = { 7,12 }; // DEFAULT COLORS
@@ -469,7 +468,7 @@ int arrowKeySelection::resetOrProceed(int& check) {
         return counter;
     }
 }
-//PENTINGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG
+//end of PENTINGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG
 
 int arrowKeySelection::editStuDetailSelection() {
 
@@ -512,6 +511,93 @@ int arrowKeySelection::editStuDetailSelection() {
         return counter;
     }
     else if (counter == 2) {
+        return counter;
+    }
+}
+
+int arrowKeySelection::facultySelection() {
+
+    int Set[] = { 12,7,7,7,7 }; // DEFAULT COLORS
+    int counter = 1;
+    char key;
+
+    for (int i = 0;;) {
+
+        gotoxy(32, 9);
+        color(Set[0]);
+        cout << "1. Faculty of Aviation & Aircraft Maintenance Technology";
+
+        gotoxy(32, 11);
+        color(Set[1]);
+        cout << "2. Faculty of Computer Science & Mathematics";
+
+        gotoxy(32, 13);
+        color(Set[2]);
+        cout << "3. Faculty of Chemical Engineering and Bioengineering Technology";
+
+        gotoxy(32, 15);
+        color(Set[3]);
+        cout << "4. Faculty of Business and Accountancy";
+
+        gotoxy(32, 17);
+        color(Set[4]);
+        cout << "5. Faculty of Health Sciences";
+
+        key = _getch();
+        if (key == 72 && (counter >= 2 && counter <= 5)) { counter--; } //72 for arrow up key
+        if (key == 80 && (counter >= 1 && counter <= 4)) { counter++; }  //80 for arrow down key
+
+        if (key == '\r')//carriage return
+        {   // if enter is click and highlight is on 1 the program will run the code here
+            if (counter == 1) {
+                break;
+            }
+            if (counter == 2) {
+                break;
+            }
+            if (counter == 3) {
+                break;
+            }
+            if (counter == 4) {
+                break;
+            }
+            if (counter == 5) {
+                break;
+            }
+        }
+        //default white
+        Set[0] = 7;
+        Set[1] = 7;
+        Set[2] = 7;
+        Set[3] = 7;
+        Set[4] = 7;
+
+        //set colours during selection
+        if (counter == 1) { Set[0] = 12; }
+        if (counter == 2) { Set[1] = 12; }
+        if (counter == 3) { Set[2] = 12; }
+        if (counter == 4) { Set[3] = 12; }
+        if (counter == 5) { Set[4] = 12; }
+    }
+
+    if (counter == 1) {
+        system("cls");
+        return counter;
+    }
+    else if (counter == 2) {
+        system("cls");
+        return counter;
+    }
+    else if (counter == 3) {
+        system("cls");
+        return counter;
+    }
+    else if (counter == 4) {
+        system("cls");
+        return counter;
+    }
+    else if (counter == 5) {
+        system("cls");
         return counter;
     }
 }

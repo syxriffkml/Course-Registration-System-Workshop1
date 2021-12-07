@@ -1,6 +1,5 @@
 #include <iostream>
-#include<sstream>
-#include <fstream> //text file (mainly for interface)
+#include <sstream>
 #include <cstdlib> //standard library
 #include <conio.h> //using getch
 #include <windows.h> //windows library (WARNING : ONLY WORKS IN WINDOWS)
@@ -20,7 +19,7 @@ int main() {
     HWND console = GetConsoleWindow();
     RECT r;
     GetWindowRect(console, &r); //stores the console's current dimensions
-    MoveWindow(console, r.left, r.top, 870, 800, TRUE); // 870 width, 800 height
+    MoveWindow(console, r.left, r.top, 1100, 700, TRUE); // 870 width, 800 height
     system("color 0f"); //0-black bg, f- white text
     //end of fixed console size
 
@@ -49,7 +48,7 @@ int main() {
                 f.studentMenu();
                 studentSelection = arrowKey.studentPageSelection();
                 if (studentSelection == 1) {
-                    //function later on
+                    f.displayFacultyAndCourses();
                     cout << "\nPress 8 to go back to student menu : ";
                     cin >> backToStudentMenu;
                     system("cls");
@@ -63,7 +62,12 @@ int main() {
                     cout << "\nPress 8 to go back to student menu : ";
                     cin >> backToStudentMenu;
                     system("cls");
-                }else if (studentSelection == 8) { // "logout"
+                }else if (studentSelection == 4) { // calculate cgpa
+                    f.addGrades();
+                    cout << "\nPress 8 to go back to student menu : ";
+                    cin >> backToStudentMenu;
+                    system("cls");
+                } else if (studentSelection == 8) { // "logout"
                     goto start;
                 }
             } while (backToStudentMenu == 8);
