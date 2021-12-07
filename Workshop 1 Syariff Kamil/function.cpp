@@ -553,6 +553,8 @@ void function::displayFacultyAndCourses() {
 }
 //End of Displaying list of Faculty and Courses (Student)
 
+
+//Start of add grades/cgpa menu
 void function::addGradesMenu() {
     cout << "( Welcome, user ";
     WriteInColor(11, username + " " + stuID);//start here, the text color will be
@@ -587,6 +589,8 @@ void function::addGradesMenu() {
     WriteInColor(11, "      +-------------------+\n\n");
     WriteInColor(7, ""); // change back the next text colour to white
 }
+//Start of add grades/cgpa menu
+
 
 //Start of add grades/cgpa function
 void function::addGrades() {
@@ -618,9 +622,9 @@ void function::addGrades() {
         cout << "Calculate cgpa for semester " << currentSemester << endl;
         do {
         again:
-            cout << "\nEnter the subject name : ";
+            /*cout << "\nEnter the subject name : ";
             cin.ignore();
-            getline(cin, subjectName);
+            getline(cin, subjectName);*/
             cout << "Enter grade (example : B+) : ";
             cin >> gradeLetter;
             cin.ignore();
@@ -671,18 +675,6 @@ void function::addGrades() {
             totGradePoints = totGradePoints + gradePoints;
             totCreditHour = totCreditHour + creditHour;
 
-            //insert into database
-            string cS = to_string(currentSemester); // change int to string
-            string cH = to_string(creditHour); // change double to string
-            string insertSubjectQuery = "insert into subject (student_id, semester, subject_name, grade, credit_hour) values ('" 
-                + stuID + "', '" + cS + "', '" + subjectName + stuID + "', '" + gradeLetter + "', '" + cH + "')";
-            const char* insertSubject = insertSubjectQuery.c_str();
-            qstate = mysql_query(conn, insertSubject);
-            if (qstate)
-            {
-                cout << "Query Execution Problem!" << mysql_errno(conn) << endl;
-            }
-
             cout << "Do you want to enter another grade (1 - Yes, 2 - no): ";
             cin >> option;
         } while (option == 1);
@@ -694,24 +686,12 @@ void function::addGrades() {
         b = b + totCreditHour;
         cgpa = a/b;
 
-        //fetch 
-        string fetchSubjectIDQuery = "select subject_id from subject where student_id = '" + stuID + "'";
-        const char* fetchSubjectID = fetchSubjectIDQuery.c_str();
-        qstate = mysql_query(conn, fetchSubjectID);
-        if (!qstate) {
-            res = mysql_store_result(conn);
-            while (row = mysql_fetch_row(res)) {
-                subjectID = row[0];
-            }
-        }
-        else {
-            cout << "Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
-        }
 
         //insert into database
+        string cS = to_string(currentSemester); // change int to string
         string gpaDB = to_string(gpa); // change int to string
         string cgpaDB = to_string(cgpa); // change double to string
-        string insertResultQuery = "insert into result (subject_id, student_id, gpa, cgpa) values ('"+ subjectID + "', '" + stuID + "', '" + gpaDB + "', '" + cgpaDB + "')";
+        string insertResultQuery = "insert into result (student_id, semester, gpa, cgpa) values ('"+ stuID + "', '" + cS + "', '" + gpaDB + "', '" + cgpaDB + "')";
         const char* insertResult = insertResultQuery.c_str();
         qstate = mysql_query(conn, insertResult);
         if (qstate)
@@ -727,14 +707,15 @@ void function::addGrades() {
         system("cls");
         addGradesMenu();
     }
-
-    
-
-    
-
 }
 //End of add grades/cgpa function
 
+
+//Start of application function
+void function::application() {
+
+}
+//End of application function
 
 
 
