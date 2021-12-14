@@ -3,7 +3,11 @@
 #include <windows.h>
 #include <conio.h> //_getch()
 #include <iomanip> //setw()
+#include <windows.h> //windows library (WARNING : ONLY WORKS IN WINDOWS)
+#include <string>
+#include <mysql.h>
 #include "arrowKeySelection.h" // menu arrow keys selection function header
+#include "function.h" // functions header
 
 using namespace std;
 
@@ -515,7 +519,7 @@ int arrowKeySelection::editStuDetailSelection() {
     }
 }
 
-int arrowKeySelection::facultySelection() {
+int arrowKeySelection::facultySelection(int& check) {
 
     int Set[] = { 12,7,7,7,7 }; // DEFAULT COLORS
     int counter = 1;
@@ -523,25 +527,50 @@ int arrowKeySelection::facultySelection() {
 
     for (int i = 0;;) {
 
-        gotoxy(32, 9);
-        color(Set[0]);
-        cout << "1. Faculty of Aviation & Aircraft Maintenance Technology";
+        if (check == 1) {
+            gotoxy(32, 11);
+            color(Set[0]);
+            cout << "1. Faculty of Aviation & Aircraft Maintenance Technology";
 
-        gotoxy(32, 11);
-        color(Set[1]);
-        cout << "2. Faculty of Computer Science & Mathematics";
+            gotoxy(32, 13);
+            color(Set[1]);
+            cout << "2. Faculty of Computer Science & Mathematics";
 
-        gotoxy(32, 13);
-        color(Set[2]);
-        cout << "3. Faculty of Chemical Engineering and Bioengineering Technology";
+            gotoxy(32, 15);
+            color(Set[2]);
+            cout << "3. Faculty of Chemical Engineering and Bioengineering Technology";
 
-        gotoxy(32, 15);
-        color(Set[3]);
-        cout << "4. Faculty of Business and Accountancy";
+            gotoxy(32, 17);
+            color(Set[3]);
+            cout << "4. Faculty of Business and Accountancy";
 
-        gotoxy(32, 17);
-        color(Set[4]);
-        cout << "5. Faculty of Health Sciences";
+            gotoxy(32, 19);
+            color(Set[4]);
+            cout << "5. Faculty of Health Sciences";
+        }
+
+        if (check == 2) {
+            gotoxy(32, 17);
+            color(Set[0]);
+            cout << "1. Faculty of Aviation & Aircraft Maintenance Technology";
+
+            gotoxy(32, 19);
+            color(Set[1]);
+            cout << "2. Faculty of Computer Science & Mathematics";
+
+            gotoxy(32, 21);
+            color(Set[2]);
+            cout << "3. Faculty of Chemical Engineering and Bioengineering Technology";
+
+            gotoxy(32, 23);
+            color(Set[3]);
+            cout << "4. Faculty of Business and Accountancy";
+
+            gotoxy(32, 25);
+            color(Set[4]);
+            cout << "5. Faculty of Health Sciences";
+        }
+        
 
         key = _getch();
         if (key == 72 && (counter >= 2 && counter <= 5)) { counter--; } //72 for arrow up key

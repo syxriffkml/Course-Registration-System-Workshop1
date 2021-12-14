@@ -67,7 +67,13 @@ int main() {
                     cout << "\nPress 8 to go back to student menu : ";
                     cin >> backToStudentMenu;
                     system("cls");
-                } else if (studentSelection == 8) { // "logout"
+                }
+                else if (studentSelection == 5) { // calculate cgpa
+                    f.application();
+                    cout << "\nPress 8 to go back to student menu : ";
+                    cin >> backToStudentMenu;
+                    system("cls");
+                }else if (studentSelection == 8) { // "logout"
                     goto start;
                 }
             } while (backToStudentMenu == 8);

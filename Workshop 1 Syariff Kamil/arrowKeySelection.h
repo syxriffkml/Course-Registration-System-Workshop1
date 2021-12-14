@@ -14,7 +14,7 @@ class arrowKeySelection {
 		int eduLevelSelection();
 		int resetOrProceed(int& check);
 		int editStuDetailSelection();
-		int facultySelection();
+		int facultySelection(int& check);
 };
 
 #endif 

@@ -16,6 +16,7 @@ class function {
 		void editStudentDisplay(); 
 		void addGradesMenu();
 		void addGrades();
+		void applicationMenu();
 		void application();
 		int adminLogin(); //ADMIN PARTS
 		void adminMenu();

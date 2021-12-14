@@ -510,7 +510,7 @@ void function::editStudentDisplay() {
 void function::displayFacultyAndCourses() {
 
     arrowKeySelection arrow;
-    int facultyselect = 0;
+    int facultyselect = 0,check = 1; //check = 2 for application
 
     cout << "( Welcome, user ";
     WriteInColor(11, username + " " + stuID);//start here, the text color will be
@@ -526,8 +526,9 @@ void function::displayFacultyAndCourses() {
     WriteInColor(7, " "); // change back the next text colour to white
 
 
-    facultyselect = arrow.facultySelection(); //arrow selection faculty, then cls
+    facultyselect = arrow.facultySelection(check); //arrow selection faculty, then cls
     string fs = to_string(facultyselect); // change int to string
+    check = 0; //reset check
 
     cout << "( Welcome, user ";
     WriteInColor(11, username + " " + stuID);//start here, the text color will be
@@ -563,10 +564,6 @@ void function::addGradesMenu() {
     cout << "                                               STUDENT MENU                                            " << endl;
     cout << "                                               -add grades-                                            " << endl;
     cout << "=======================================================================================================" << endl;
-    WriteInColor(11, "      +----------------------------------------------------------+\n"); //start here, the text color will be blue
-    WriteInColor(11, "      | INSTRUCTION : Move arrow keys (Up, Down, Left, Right) to |\n");
-    WriteInColor(11, "      | move the selection and press ENTER key to select         |\n");
-    WriteInColor(11, "      +----------------------------------------------------------+\n\n");
 
     WriteInColor(11, "      +----------------------------------------------------------+\n"); //start here, the text color will be
     WriteInColor(11, "      | INSTRUCTION :                                            |\n");
@@ -710,10 +707,96 @@ void function::addGrades() {
 }
 //End of add grades/cgpa function
 
+void function::applicationMenu() {
+    WriteInColor(7, "( Welcome, user ");
+    WriteInColor(11, username + " " + stuID);//start here, the text color will be
+    WriteInColor(7, " )\n"); // change back the next text colour to white
+    cout << "=======================================================================================================" << endl;
+    cout << "                                               STUDENT MENU                                            " << endl;
+    cout << "                                           -course application-                                        " << endl;
+    cout << "=======================================================================================================" << endl;
+
+    WriteInColor(11, "                       +----------------------------------------------------------+\n"); //start here, the text color will be
+    WriteInColor(11, "                       | INSTRUCTION :                                            |\n");
+    WriteInColor(11, "                       | (1) Move arrow keys (Up, Down, Left, Right) to move the  |\n");
+    WriteInColor(11, "                       | selection and press ENTER key to select                  |\n");
+    WriteInColor(11, "                       | (2) You need to select 3 courses for the application     |\n");
+    WriteInColor(11, "                       | (3) Make sure the information you add is CORRECT!        |\n");
+    WriteInColor(11, "                       +----------------------------------------------------------+\n");
+    WriteInColor(7, ""); // change back the next text colour to white
+}
 
 //Start of application function
 void function::application() {
 
+    arrowKeySelection arrow;
+    int facultyselect = 0, check = 2; // check = 1 for display faculty n courses
+    string course[3];
+
+    for (int i = 0; i < 3; i++) {
+        applicationMenu(); //display title
+        cout << endl << endl;
+        cout << setw(73) << "-Choose your desired courses for course " << i + 1 << "-";
+
+        facultyselect = arrow.facultySelection(check); //arrow selection faculty, then cls
+        string fs = to_string(facultyselect); // change int to string
+
+        applicationMenu(); //display title
+        cout << endl << endl;
+        cout << setw(73) << "-Choose your desired courses for course " << i + 1 << "-\n\n";
+
+        //to display courses based on faculty
+        string facultyQuery = "select * from courses where faculty_id = '" + fs + "'";
+        const char* fQuery = facultyQuery.c_str();
+        qstate = mysql_query(conn, fQuery);
+        if (!qstate) {
+            res = mysql_store_result(conn);
+            while (row = mysql_fetch_row(res)) {
+                cout << "Course Code : " << row[2] << setw(20) << "Course Name : " << row[3] << endl;
+            }
+        }
+        else {
+            cout << "Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
+        }
+
+        cout << endl << endl;
+        again:
+        cout << setw(73) << "Enter course code for your desired course " << i + 1 << " :";
+        cin >> course[i];
+
+        //check if course is available in db
+        string checkQuery = "select programme_code from courses where programme_code = '" + course[i] + "'";
+        const char* cQ = checkQuery.c_str();
+        qstate = mysql_query(conn, cQ);
+        if (!qstate) {
+            res = mysql_store_result(conn);
+            if (res->row_count == 1){ //check if the course code is same in database
+                cout << endl << endl;
+                cout << setw(66) << "SUCCESSFULLY ADDED COURSE " << i+1 << endl;
+            }
+            else {
+                goto again;
+            }
+        }
+        else {
+            cout << "Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
+        }
+        system("pause");
+        system("cls");
+    }
+
+    string addApplicationQuery = "insert into application (student_id, course1, course2, course3) values ('" + stuID + "', '" + course[0] + "', '" + course[1] + "', '" + course[2] + "')";
+    const char* addApplication = addApplicationQuery.c_str();
+    qstate = mysql_query(conn, addApplication);
+    if (!qstate) {
+        applicationMenu(); //display title
+        cout << endl << endl;
+        cout << setw(73) << "YOU HAVE SUCCESSFULLY REGISTERED YOUR COURSES" << endl;
+    }
+    else {
+        cout << "Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
+    }
+    check = 0; //reset check
 }
 //End of application function
 
