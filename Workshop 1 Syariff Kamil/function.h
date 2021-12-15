@@ -18,6 +18,8 @@ class function {
 		void addGrades();
 		void applicationMenu();
 		void application();
+		void viewApplication();
+		void applicationResult();
 		int adminLogin(); //ADMIN PARTS
 		void adminMenu();
 };

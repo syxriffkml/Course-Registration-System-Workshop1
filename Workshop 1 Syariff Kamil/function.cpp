@@ -20,7 +20,7 @@ MYSQL* conn;
 MYSQL_ROW row;
 MYSQL_RES* res;
 
-string stuID, username, subjectID;
+string stuID, username, subjectID, adminID, adminUser;
 // Global Variable End
 
 
@@ -268,9 +268,8 @@ void function::studentMenu() {
         WriteInColor(7, " "); // change back the next text colour to white
     }
     else {
-        cout << "Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
+        cout << "6Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
     }
-
 }
 //end of student menu function
 
@@ -372,7 +371,7 @@ void function::studentDetail() {
             return;
         }
         else {
-            cout << "Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
+            cout << "7Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
         }
     }
 }
@@ -500,7 +499,7 @@ void function::editStudentDisplay() {
         }
     }
     else {
-        cout << "Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
+        cout << "8Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
     }
 }
 //End of student view/edit details
@@ -549,7 +548,7 @@ void function::displayFacultyAndCourses() {
         }
     }
     else {
-        cout << "Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
+        cout << "9Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
     }
 }
 //End of Displaying list of Faculty and Courses (Student)
@@ -693,7 +692,7 @@ void function::addGrades() {
         qstate = mysql_query(conn, insertResult);
         if (qstate)
         {
-            cout << "Query Execution Problem!" << mysql_errno(conn) << endl;
+            cout << "10Query Execution Problem!" << mysql_errno(conn) << endl;
         }
 
         system("cls");
@@ -707,6 +706,8 @@ void function::addGrades() {
 }
 //End of add grades/cgpa function
 
+
+//Start of application menu
 void function::applicationMenu() {
     WriteInColor(7, "( Welcome, user ");
     WriteInColor(11, username + " " + stuID);//start here, the text color will be
@@ -725,6 +726,8 @@ void function::applicationMenu() {
     WriteInColor(11, "                       +----------------------------------------------------------+\n");
     WriteInColor(7, ""); // change back the next text colour to white
 }
+//Start of application menu
+
 
 //Start of application function
 void function::application() {
@@ -801,11 +804,65 @@ void function::application() {
 //End of application function
 
 
+//Start of view application function
+void function::viewApplication() {
+    cout << "( Welcome, user ";
+    WriteInColor(11, username + " " + stuID);//start here, the text color will be
+    WriteInColor(7, " )\n"); // change back the next text colour to white
+    cout << "=======================================================================================================" << endl;
+    cout << "                                               STUDENT MENU                                            " << endl;
+    cout << "                                            -view application-                                         " << endl;
+    cout << "=======================================================================================================" << endl << endl;
+
+    //display course 1
+    string facultyQuery1 = "select programme_code, programme_name from courses where programme_code in(select course1 from application where student_id = '" + stuID + "')";
+    const char* fQuery1 = facultyQuery1.c_str();
+    qstate = mysql_query(conn, fQuery1);
+    if (!qstate) {
+        res = mysql_store_result(conn);
+        while (row = mysql_fetch_row(res)) {
+            cout << "COURSE 1 : " << row[1] << endl;
+        }
+    }
+
+    //display course 2
+    string facultyQuery2 = "select programme_code, programme_name from courses where programme_code in(select course2 from application where student_id = '" + stuID + "')";
+    const char* fQuery2 = facultyQuery2.c_str();
+    qstate = mysql_query(conn, fQuery2);
+    if (!qstate) {
+        res = mysql_store_result(conn);
+        while (row = mysql_fetch_row(res)) {
+            cout << "COURSE 2 : " << row[1] << endl;
+        }
+    }
+
+    //display course 3
+    string facultyQuery3 = "select programme_code, programme_name from courses where programme_code in(select course3 from application where student_id = '" + stuID + "')";
+    const char* fQuery3 = facultyQuery3.c_str();
+    qstate = mysql_query(conn, fQuery3);
+    if (!qstate) {
+        res = mysql_store_result(conn);
+        while (row = mysql_fetch_row(res)) {
+            cout << "COURSE 3 : " << row[1] << endl;
+        }
+    }
+}
+//End of view application function
 
 
+//Start of application result function
+void function::applicationResult() {
+    cout << "( Welcome, user ";
+    WriteInColor(11, username + " " + stuID);//start here, the text color will be
+    WriteInColor(7, " )\n"); // change back the next text colour to white
+    cout << "=======================================================================================================" << endl;
+    cout << "                                               STUDENT MENU                                            " << endl;
+    cout << "                                           -application result-                                        " << endl;
+    cout << "=======================================================================================================" << endl << endl;
 
-
-
+    
+}
+//End of application result function
 
 
 //Start of admin login function (TABLE NOT CREATED YET)
@@ -813,32 +870,33 @@ int function::adminLogin() {
 
     int count = 0;
     admin_login:
-    string ic_num, password = "", studentPasswordDB;
+    string adminName, adminPass = "", adminPasswordDB;
     char ch;
 
     cout << "========================================================================" << endl;
     cout << "                               ADMIN LOGIN                              " << endl;
     cout << "========================================================================" << endl;
-    cout << "Enter IC number ( without - ) : ";
-    cin >> ic_num;
+    cout << "Enter Admin Username : ";
+    getline(cin, adminName);
 
-    cout << "Enter password : ";
+    cout << "Enter Admin Password : ";
     while (ch = _getch()) { //assign ASCII value to ch
         if (ch == 13) {  //13 is ENTER key in ASCII
 
-            string studentLoginQuerry = "select * from student where ic_num = '" + ic_num + "' and password = '" + password + "'";
-            const char* stuLogin = studentLoginQuerry.c_str();
-            qstate = mysql_query(conn, stuLogin);
+            string adminLoginQuerry = "select * from admin where admin_username = '" + adminName + "' and admin_password = '" + adminPass + "'";
+            const char* adminLogin = adminLoginQuerry.c_str();
+            qstate = mysql_query(conn, adminLogin);
 
             if (!qstate) {
                 res = mysql_store_result(conn);
                 if (res->row_count == 1) { //
                     while (row = mysql_fetch_row(res)) {
-                        stuID = row[0]; //ibarat $_SESSION dalam php la gitu (row[0] is row student id dalam database)
-                        studentPasswordDB = row[5]; //row[5] for password
+                        adminID = row[0]; //ibarat $_SESSION dalam php la gitu (row[0] is row student id dalam database)
+                        adminUser = row[1];
+                        adminPasswordDB = row[2]; //row[5] for password
                     }
                 }
-                if (password == studentPasswordDB) {//password exaclty sama ngan database
+                if (adminPass == adminPasswordDB) {//password exaclty sama ngan database
                     system("cls");
                     cout << "========================================================================" << endl;
                     cout << "                               ADMIN LOGIN                              " << endl;
@@ -849,9 +907,9 @@ int function::adminLogin() {
                     system("cls");
                     return count = 0;
                 }
-                else if (password != studentPasswordDB) {
-                    ic_num = "";
-                    password = "";
+                else if (adminPass != adminPasswordDB) {
+                    adminName = "";
+                    adminPass = "";
                     count++;
                     if (count == 3) { //if student unable to login 3 times, the program will go back to main()
                         system("cls");
@@ -859,7 +917,7 @@ int function::adminLogin() {
                         cout << "========================================================================" << endl;
                         cout << "                               ADMIN LOGIN                              " << endl;
                         cout << "========================================================================" << endl;
-                        cout << "\nERROR, INCORRECT IC NUMBER or PASSWORD\nYOU WILL GO BACK TO MAIN MENU" << endl;
+                        cout << "\nERROR, INCORRECT ADMIN USERNAME or PASSWORD\nYOU WILL GO BACK TO MAIN MENU" << endl;
                         //cout << endl << ifstream("interface/ErrorLogin.txt").rdbuf() << endl << endl << endl << endl;
                         system("pause");
                         system("cls");
@@ -871,7 +929,7 @@ int function::adminLogin() {
                         cout << "========================================================================" << endl;
                         cout << "                               ADMIN LOGIN                              " << endl;
                         cout << "========================================================================" << endl;
-                        cout << "\nERROR, INCORRECT IC NUMBER or PASSWORD" << endl;
+                        cout << "\nERROR, INCORRECT ADMIN USERNAME or PASSWORD" << endl;
                         //cout << endl << ifstream("interface/ErrorLogin.txt").rdbuf() << endl << endl << endl << endl;
                         system("pause");
                         system("cls");
@@ -884,15 +942,15 @@ int function::adminLogin() {
             }
         }
         else if (ch == 8) { //8 is BACKSPACE key in ASCII
-            if (password.length() > 0) { //set condition blocking error while input
+            if (adminPass.length() > 0) { //set condition blocking error while input
                 cout << "\b \b"; //delete * everytime user click backspace
-                password.erase(password.length() - 1); //erase string length
+                adminPass.erase(adminPass.length() - 1); //erase string length
             }
         }
         else {
             //make password cannot be seen, when input it display as pasword : ************
             cout << "*";
-            password += ch;
+            adminPass += ch;
         }
     }
 }
@@ -902,9 +960,20 @@ int function::adminLogin() {
 //start of admin menu function
 void function::adminMenu() {
 
-    cout << "========================================================================" << endl;
-    cout << "                               ADMIN LOGIN                              " << endl;
-    cout << "========================================================================" << endl;
-    cout << "ADMIN PUNYA MENU" << endl;
+    WriteInColor(7, "( Welcome, user ");
+    WriteInColor(11, adminUser + " " + adminID);//start here, the text color will be
+    WriteInColor(7, " )\n"); // change back the next text colour to white
+    cout << "=======================================================================================================" << endl;
+    cout << "                                                ADMIN MENU                                             " << endl;
+    cout << "=======================================================================================================" << endl;
+
+    WriteInColor(11, "                       +----------------------------------------------------------+\n"); //start here, the text color will be
+    WriteInColor(11, "                       | INSTRUCTION :                                            |\n");
+    WriteInColor(11, "                       | Move arrow keys (Up, Down, Left, Right) to move the      |\n");
+    WriteInColor(11, "                       | selection and press ENTER key to select                  |\n");
+    WriteInColor(11, "                       +----------------------------------------------------------+\n");
+    WriteInColor(7, ""); // change back the next text colour to white
+
+
 }
 //end of admin menu function

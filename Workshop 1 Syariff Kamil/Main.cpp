@@ -68,12 +68,19 @@ int main() {
                     cin >> backToStudentMenu;
                     system("cls");
                 }
-                else if (studentSelection == 5) { // calculate cgpa
+                else if (studentSelection == 5) { // apply 3 courses
                     f.application();
                     cout << "\nPress 8 to go back to student menu : ";
                     cin >> backToStudentMenu;
                     system("cls");
-                }else if (studentSelection == 8) { // "logout"
+                }
+                else if (studentSelection == 6) { // view application
+                    f.viewApplication();
+                    cout << "\nPress 8 to go back to student menu : ";
+                    cin >> backToStudentMenu;
+                    system("cls");
+                }
+                else if (studentSelection == 8) { // "logout"
                     goto start;
                 }
             } while (backToStudentMenu == 8);
