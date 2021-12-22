@@ -734,7 +734,7 @@ void function::application() {
 
     arrowKeySelection arrow;
     int facultyselect = 0, check = 2; // check = 1 for display faculty n courses
-    string course[3];
+    string course[3] = {"1","2","3"};
 
     for (int i = 0; i < 3; i++) {
         applicationMenu(); //display title
@@ -764,7 +764,7 @@ void function::application() {
 
         cout << endl << endl;
         again:
-        cout << setw(73) << "Enter course code for your desired course " << i + 1 << " :";
+        cout << setw(73) << "Enter course code for your desired course " << i + 1 << " : ";
         cin >> course[i];
 
         //check if course is available in db
@@ -774,8 +774,14 @@ void function::application() {
         if (!qstate) {
             res = mysql_store_result(conn);
             if (res->row_count == 1){ //check if the course code is same in database
-                cout << endl << endl;
-                cout << setw(66) << "SUCCESSFULLY ADDED COURSE " << i+1 << endl;
+                if ( (course[2] == course[0]) || (course[2] == course[1]) || (course[1] == course[0]) ){ //check if student apply for the same course
+                    cout << setw(90) << "YOU HAVE ALREADY INPUT THE COURSE, PLEASE CHOOSE OTHER COURSES" << endl << endl;
+                    goto again;
+                }
+                else {
+                    cout << endl << endl;
+                    cout << setw(66) << "SUCCESSFULLY ADDED COURSE " << i + 1 << endl;
+                }        
             }
             else {
                 goto again;
@@ -788,10 +794,22 @@ void function::application() {
         system("cls");
     }
 
+    //SQL ADD ALL 3 COURSES INTO TABLE
     string addApplicationQuery = "insert into application (student_id, course1, course2, course3) values ('" + stuID + "', '" + course[0] + "', '" + course[1] + "', '" + course[2] + "')";
     const char* addApplication = addApplicationQuery.c_str();
     qstate = mysql_query(conn, addApplication);
     if (!qstate) {
+        //SQL INCREMENT NUMBER OF STUDENTS APPLY FOR SPECIFIC COURSES
+        for (int i = 0; i < 3; i++) {
+            string incrementStudent = "UPDATE courses SET numOfStudent = IFNULL(numOfStudent, 0) + 1 WHERE programme_code = '" + course[i] + "'";
+            const char* iSQuery = incrementStudent.c_str();
+            qstate = mysql_query(conn, iSQuery);
+            if (qstate) {
+                cout << "Query Execution Problem! query " << i+1 <<"MySQL Error #" << mysql_errno(conn) << endl;
+            }
+        }
+        
+        //END OF SQL INCREMENT NUMBER OF STUDENTS APPLY FOR SPECIFIC COURSES
         applicationMenu(); //display title
         cout << endl << endl;
         cout << setw(73) << "YOU HAVE SUCCESSFULLY REGISTERED YOUR COURSES" << endl;
@@ -973,7 +991,197 @@ void function::adminMenu() {
     WriteInColor(11, "                       | selection and press ENTER key to select                  |\n");
     WriteInColor(11, "                       +----------------------------------------------------------+\n");
     WriteInColor(7, ""); // change back the next text colour to white
-
-
 }
 //end of admin menu function
+
+
+//Start of admin view graph menu
+void function::adminViewGraphMenu() {
+    WriteInColor(7, "( Welcome, user ");
+    WriteInColor(11, adminUser + " " + adminID);//start here, the text color will be
+    WriteInColor(7, " )\n"); // change back the next text colour to white
+    cout << "=======================================================================================================" << endl;
+    cout << "                                                ADMIN MENU                                             " << endl;
+    cout << "                                               -view graph-                                            " << endl;
+    cout << "=======================================================================================================" << endl << endl;
+
+    WriteInColor(11, "                       +----------------------------------------------------------+\n"); //start here, the text color will be
+    WriteInColor(11, "                       | INSTRUCTION :                                            |\n");
+    WriteInColor(11, "                       | Move arrow keys (Up, Down, Left, Right) to move the      |\n");
+    WriteInColor(11, "                       | selection and press ENTER key to select                  |\n");
+    WriteInColor(11, "                       +----------------------------------------------------------+\n");
+    WriteInColor(7, ""); // change back the next text colour to white
+}
+//End of admin view graph menu
+
+//start of admin view graph function
+void function::adminViewGraph() {
+
+    adminViewGraphMenu();
+    int graphSelect = 0;
+
+    arrowKeySelection arrow;
+    graphSelect = arrow.adminGraphSelection();
+
+    if (graphSelect == 1) { //View Total Registered Users
+        adminViewGraphMenu();
+        string numOfRegisteredStudent,numOfStudentApplication;
+
+        //START OF GET NUMBER OF REGISTERED USER
+        string countRegisteredStudent = "SELECT COUNT(*) FROM STUDENT";
+        const char* cruQuery = countRegisteredStudent.c_str();
+        qstate = mysql_query(conn, cruQuery);
+        if (!qstate) {
+            res = mysql_store_result(conn);
+            if (res->row_count == 1) { //
+                while (row = mysql_fetch_row(res)) {
+                    numOfRegisteredStudent = row[0];
+                }
+            }
+        }
+        else {
+            cout << "Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
+        }
+        //END OF GET NUMBER OF REGISTERED USER
+
+        //START OF GET NUMBER OF STUDENT WHO ALREADY APPLIED
+        string countStudentApplication = "SELECT COUNT(*) FROM application";
+        const char* csaQuery = countStudentApplication.c_str();
+        qstate = mysql_query(conn, csaQuery);
+        if (!qstate) {
+            res = mysql_store_result(conn);
+            if (res->row_count == 1) { //
+                while (row = mysql_fetch_row(res)) {
+                    numOfStudentApplication = row[0];
+                }
+            }
+        }
+        else {
+            cout << "Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
+        }
+        //END OF GET NUMBER OF STUDENT WHO ALREADY APPLIED
+
+
+        //CASTING, CHANGE STRING TO INT
+        stringstream registered(numOfRegisteredStudent); //Number of registered student
+        int x = 0;
+        registered >> x; 
+
+        stringstream stuApp(numOfStudentApplication); //Number of student who already apply for courses
+        int y = 0;
+        stuApp >> y; 
+        // END OF CASTING, CHANGE STRING TO INT
+
+        cout << setw(50) << " +--------------+ " << endl;
+        cout << setw(50) << " |  Bar graphs  | " << endl;
+        cout << setw(50) << " +--------------+ " << endl << endl;
+
+        cout << "Registered Students : ";
+        cout << left << setw(36);
+        WriteInColor(11, "");
+        for (int j = 1; j <= x; j++) { //j <= Number of registered student
+            cout << char(219); //display bar
+            if (j == x) {
+                WriteInColor(7, "  ");
+                cout << j << endl << endl;
+            }
+        }
+        cout << "Student who havent make application : ";
+        cout << left << setw(20);
+        WriteInColor(11, "");
+        for (int j = 1; j <= y; j++) { // j <= Number of student who already apply for courses
+            cout << char(219); //display bar
+            if (j == y) {
+                WriteInColor(7, "  ");
+                cout << j << endl << endl;
+            }
+        }
+    }
+    else if (graphSelect == 2) { //View Total Number of Students In Each Faculty
+        adminViewGraphMenu();
+        string facultyAviation, facultyCS, facultyChemical, facultyBusiness,facultyHealth;
+
+        //START OF GET NUMBER OF STUDENTS IN AVIATION
+        string countStudentFaculty1 = "SELECT IFNULL(SUM(numOfStudent), 0) FROM courses where faculty_id = 1";
+        const char* csfQuery1 = countStudentFaculty1.c_str();
+        qstate = mysql_query(conn, csfQuery1);
+        if (!qstate) {
+            res = mysql_store_result(conn);
+            if (res->row_count == 1) { //
+                while (row = mysql_fetch_row(res)) {
+                    facultyAviation = row[0];
+                }
+            }
+        }
+        //END OF GET NUMBER OF STUDENTS IN AVIATION
+
+        //START OF GET NUMBER OF STUDENTS IN COMP SCIENCE
+        string countStudentFaculty2 = "SELECT IFNULL(SUM(numOfStudent), 0) FROM courses where faculty_id = 2";
+        const char* csfQuery2 = countStudentFaculty2.c_str();
+        qstate = mysql_query(conn, csfQuery2);
+        if (!qstate) {
+            res = mysql_store_result(conn);
+            if (res->row_count == 1) { //
+                while (row = mysql_fetch_row(res)) {
+                    facultyCS = row[0];
+                }
+            }
+        }
+        //END OF GET NUMBER OF STUDENTS IN COMP SCIENCE
+
+        //START OF GET NUMBER OF STUDENTS IN CHEMICAL ENGINEERING
+        string countStudentFaculty3 = "SELECT IFNULL(SUM(numOfStudent), 0) FROM courses where faculty_id = 3";
+        const char* csfQuery3 = countStudentFaculty3.c_str();
+        qstate = mysql_query(conn, csfQuery3);
+        if (!qstate) {
+            res = mysql_store_result(conn);
+            if (res->row_count == 1) { //
+                while (row = mysql_fetch_row(res)) {
+                    facultyChemical = row[0];
+                }
+            }
+        }
+        //END OF GET NUMBER OF STUDENTS IN CHEMICAL ENGINEERING
+
+        //START OF GET NUMBER OF STUDENTS IN BUSINESS/ACCOUNT
+        string countStudentFaculty4 = "SELECT IFNULL(SUM(numOfStudent), 0) FROM courses where faculty_id = 4";
+        const char* csfQuery4 = countStudentFaculty4.c_str();
+        qstate = mysql_query(conn, csfQuery4);
+        if (!qstate) {
+            res = mysql_store_result(conn);
+            if (res->row_count == 1) { //
+                while (row = mysql_fetch_row(res)) {
+                    facultyBusiness = row[0];
+                }
+            }
+        }
+        //END OF GET NUMBER OF STUDENTS IN BUSINESS/ACCOUNT
+
+        //START OF GET NUMBER OF STUDENTS IN HEALTH SCIENCES
+        string countStudentFaculty5 = "SELECT IFNULL(SUM(numOfStudent), 0) FROM courses where faculty_id = 5";
+        const char* csfQuery5 = countStudentFaculty5.c_str();
+        qstate = mysql_query(conn, csfQuery5);
+        if (!qstate) {
+            res = mysql_store_result(conn);
+            if (res->row_count == 1) { //
+                while (row = mysql_fetch_row(res)) {
+                    facultyHealth = row[0];
+                }
+            }
+        }
+        //END OF GET NUMBER OF STUDENTS IN HEALTH SCIENCES
+
+        cout << "Faculty 1 : " << facultyAviation << endl;
+        cout << "Faculty 2 : " << facultyCS << endl;
+        cout << "Faculty 3 : " << facultyChemical << endl;
+        cout << "Faculty 4 : " << facultyBusiness << endl;
+        cout << "Faculty 5 : " << facultyHealth << endl;
+    }
+
+
+
+    
+    
+    
+}
+//end of admin view graph function
