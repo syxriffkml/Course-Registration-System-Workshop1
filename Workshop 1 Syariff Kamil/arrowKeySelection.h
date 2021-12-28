@@ -10,11 +10,15 @@ class arrowKeySelection {
 		int mainMenuSelection();
 		int loginSelection();
 		int studentPageSelection();
+		int maleOrFemale();
 		int maritalStatusSelection();
 		int eduLevelSelection();
 		int resetOrProceed(int& check);
 		int editStuDetailSelection();
 		int facultySelection(int& check);
+		int adminPageSelection();
+		int adminGraphSelection();
+		int adminStudentListSelection();
 };
 
 #endif 

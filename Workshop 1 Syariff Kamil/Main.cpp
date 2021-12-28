@@ -29,8 +29,8 @@ int main() {
 
     function f;
     arrowKeySelection arrowKey;
-    int selection = 0, loginType = 0, studentSelection = 0;
-    int count = 0, backToStudentMenu=0;
+    int selection = 0, loginType = 0, studentSelection = 0, adminSelection = 0;
+    int count = 0, backToStudentMenu=0, backToAdminMenu=0;
     char choice;
 
     start:
@@ -85,15 +85,40 @@ int main() {
                 }
             } while (backToStudentMenu == 8);
         }
-        else if (loginType == 2) { //ADMIN LOGIN (TABLE NOT CREATED YET SO CAN'T LOGIN)
+        else if (loginType == 2) { //ADMIN LOGIN 
             count = f.adminLogin();
             if (count == 3) {
                 goto start;
             }
-            f.adminMenu();
+            do {
+                f.adminMenu();
+                adminSelection = arrowKey.adminPageSelection();
+                if (adminSelection == 1) { //VIEW GRAPHS
+                    f.adminViewGraph();
+                    cout << "\nPress 8 to go back to admin menu : ";
+                    cin >> backToAdminMenu;
+                    system("cls");
+                }
+                else if (adminSelection == 2) { //VIEW LIST OF STUDENT
+                    f.adminViewStudentList();
+                    cout << "\nPress 8 to go back to admin menu : ";
+                    cin >> backToAdminMenu;
+                    system("cls");
+                }
+                else if (adminSelection == 3) { //APPROVE STUDENT APPLICATION
+                    f.adminApproval();
+                    cout << "\nPress 8 to go back to admin menu : ";
+                    cin >> backToAdminMenu;
+                    system("cls");
+                }
+                else if (adminSelection == 5) { //"logout"
+                    goto start;
+                }
+            } while (backToAdminMenu == 8);
+            
         }
     }
-    else if (selection == 2) { // REGISTER
+    else if (selection == 2) { // REGISTRATION
         f.registration();
         goto start;
     }
