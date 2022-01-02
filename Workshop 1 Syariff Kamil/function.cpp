@@ -21,7 +21,6 @@ MYSQL_ROW row;
 MYSQL_RES* res;
 
 string stuID, username, subjectID, adminID, adminUser;
-int maxStudentPerCourses = 5;
 // Global Variable End
 
 
@@ -73,8 +72,9 @@ void function::mainMenu() {
     cout << "                               -MAIN MENU-                              " << endl;
     cout << "========================================================================" << endl;
     WriteInColor(11, "      +----------------------------------------------------------+\n"); //start here, the text color will be
-    WriteInColor(11, "      | INSTRUCTION : Move arrow keys (Up, Down, Left, Right) to |\n");
-    WriteInColor(11, "      | move the selection and press ENTER key to select         |\n");
+    WriteInColor(11, "      | INSTRUCTION : (1) Move arrow keys (Up, Down) to move the |\n");
+    WriteInColor(11, "      | selection and press ENTER key to select                  |\n");
+    WriteInColor(11, "      | (2) Please run the program in fullscreen                 |\n");
     WriteInColor(11, "      +----------------------------------------------------------+\n");
     WriteInColor(7, " "); // change back the next text colour to white
     //selection = arrowKey.mainMenuSelection(); 
@@ -86,7 +86,9 @@ void function::mainMenu() {
 //Start of student register function
 void function::registration() {
 
+    arrowKeySelection arrow;
     string username, ic_num, gender, email, password;
+    int genderSelect, check = 1;
 
     cout << "========================================================================" << endl;
     cout << "                           STUDENT REGISTRATION                         " << endl;
@@ -98,10 +100,19 @@ void function::registration() {
     cin >> ic_num;
 
     cout << "\nEnter gender (Male or Female) : ";
-    cin.ignore();
-    getline(cin, gender);
+    genderSelect = arrow.maleOrFemale(check);
+    if (genderSelect == 1) {
+        gender = "Male";
+        check = 0;
+    }
+    else if (genderSelect == 2) {
+        gender = "Female";
+        check = 0;
+    }
+    WriteInColor(7, " ");
 
-    cout << "\nEnter email : ";
+    cout << "\n\nEnter email : ";
+    cin.ignore();
     getline(cin, email);
 
     cout << "\nEnter password : ";
@@ -174,6 +185,7 @@ student_login:
                 if (res->row_count == 1) { //
                     while (row = mysql_fetch_row(res)) {
                         stuID = row[0]; //ibarat $_SESSION dalam php la gitu (row[0] is row student id dalam database)
+                        username = row[1];
                         studentICnum = row[2];  //row[1] for ic number
                         studentPasswordDB = row[5]; //row[5] for password
                     }
@@ -323,7 +335,7 @@ void function::studentDetail() {
     WriteInColor(7, " ");
 
     cout << "\n\nSelect past education level : ";
-    eduSelection = arrow.eduLevelSelection();
+    eduSelection = arrow.eduLevelSelection(check);
     if (eduSelection == 1) {
         eduLevel = "Diploma";
     }
@@ -386,6 +398,7 @@ void function::editStudentDisplay() {
     viewDetail:
     arrowKeySelection arrow;
     int edit = 0;
+    string cgpaResult;
 
     cout << "( Welcome, user ";
     WriteInColor(11, username + " " + stuID);//start here, the text color will be
@@ -402,6 +415,18 @@ void function::editStudentDisplay() {
     WriteInColor(11, "      | address, phone number & marital status can be change     |\n");
     WriteInColor(11, "      +----------------------------------------------------------+\n");
     WriteInColor(7, " "); // change back the next text colour to white
+
+    string getCGPA = "select cgpa from result where semester = (SELECT MAX(semester) FROM result WHERE result.student_id= '" + stuID + "') AND result.student_id= '" + stuID + "'";
+    const char* cgpa = getCGPA.c_str();
+    qstate = mysql_query(conn, cgpa);
+    if (!qstate) {
+        res = mysql_store_result(conn);
+        if (res->row_count == 1) {
+            while (row = mysql_fetch_row(res)) {
+                cgpaResult = row[0];
+            }
+        }
+    }
 
     string stuDetailQuery = "select * from student,studentdetails where student.student_id ='" + stuID + "' AND studentdetails.student_id = '" + stuID + "'"; //from 2 tables
     const char* viewStudentDetail = stuDetailQuery.c_str();
@@ -421,6 +446,7 @@ void function::editStudentDisplay() {
                 WriteInColor(7, "\n\n       Marital Status : "); WriteInColor(11, row[11]);
                 WriteInColor(7, "\n\n       Education Level : "); WriteInColor(11, row[12]);
                 WriteInColor(7, "\n\n       Work Experience : "); WriteInColor(11, row[13]);
+                WriteInColor(7, "\n\n       Past CGPA : "); WriteInColor(11,""); cout << cgpaResult;
                 WriteInColor(7, "\n"); // change back the next text colour to white
 
                 
@@ -519,11 +545,12 @@ void function::displayFacultyAndCourses() {
     cout << "                                               STUDENT MENU                                            " << endl;
     cout << "                                            -list of faculties-                                        " << endl;
     cout << "=======================================================================================================" << endl;
-    WriteInColor(11, "      +----------------------------------------------------------+\n"); //start here, the text color will be
-    WriteInColor(11, "      | INSTRUCTION : Move arrow keys (Up, Down, Left, Right) to |\n");
-    WriteInColor(11, "      | move the selection and press ENTER key to select         |\n");
-    WriteInColor(11, "      +----------------------------------------------------------+\n");
-    WriteInColor(7, " "); // change back the next text colour to white
+    WriteInColor(11, "                       +----------------------------------------------------------+\n"); //start here, the text color will be
+    WriteInColor(11, "                       | INSTRUCTION :                                            |\n");
+    WriteInColor(11, "                       | Move arrow keys (Up, Down, Left, Right) to move the      |\n");
+    WriteInColor(11, "                       | selection and press ENTER key to select                  |\n");
+    WriteInColor(11, "                       +----------------------------------------------------------+\n");
+    WriteInColor(7, ""); // change back the next text colour to white
 
 
     facultyselect = arrow.facultySelection(check); //arrow selection faculty, then cls
@@ -549,7 +576,7 @@ void function::displayFacultyAndCourses() {
         }
     }
     else {
-        cout << "9Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
+        cout << "Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
     }
 }
 //End of Displaying list of Faculty and Courses (Student)
@@ -622,7 +649,7 @@ void function::addGrades() {
             /*cout << "\nEnter the subject name : ";
             cin.ignore();
             getline(cin, subjectName);*/
-            cout << "Enter grade (example : B+) : ";
+            cout << "\nEnter grade (example : B+) : ";
             cin >> gradeLetter;
             cin.ignore();
             do {//will loop if user didnt input number
@@ -720,8 +747,8 @@ void function::applicationMenu() {
 
     WriteInColor(11, "                       +----------------------------------------------------------+\n"); //start here, the text color will be
     WriteInColor(11, "                       | INSTRUCTION :                                            |\n");
-    WriteInColor(11, "                       | (1) Move arrow keys (Up, Down, Left, Right) to move the  |\n");
-    WriteInColor(11, "                       | selection and press ENTER key to select                  |\n");
+    WriteInColor(11, "                       | (1) Enter 0 during the selection to go back to faculty   |\n");
+    WriteInColor(11, "                       | selection                                                |\n");
     WriteInColor(11, "                       | (2) You need to select 3 courses for the application     |\n");
     WriteInColor(11, "                       | (3) Make sure the information you add is CORRECT!        |\n");
     WriteInColor(11, "                       +----------------------------------------------------------+\n");
@@ -738,6 +765,7 @@ void function::application() {
     string course[3] = {"1","2","3"};
 
     for (int i = 0; i < 3; i++) {
+        back:
         applicationMenu(); //display title
         cout << endl << endl;
         cout << setw(73) << "-Choose your desired courses for course " << i + 1 << "-";
@@ -765,8 +793,12 @@ void function::application() {
 
         cout << endl << endl;
         again:
-        cout << setw(73) << "Enter course code for your desired course " << i + 1 << " : ";
+        cout << setw(63) << "Enter course code for your desired course " << i + 1 << "  or enter 0 to go back : ";
         cin >> course[i];
+        if (course[i] == "0") {
+            system("cls");
+            goto back;
+        }
 
         //check if course is available in db
         string checkQuery = "select programme_code from courses where programme_code = '" + course[i] + "'";
@@ -776,7 +808,7 @@ void function::application() {
             res = mysql_store_result(conn);
             if (res->row_count == 1){ //check if the course code is same in database
                 if ( (course[2] == course[0]) || (course[2] == course[1]) || (course[1] == course[0]) ){ //check if student apply for the same course
-                    cout << setw(90) << "YOU HAVE ALREADY INPUT THE COURSE, PLEASE CHOOSE OTHER COURSES" << endl << endl;
+                    cout << setw(85) << "YOU HAVE ALREADY INPUT THE COURSE, PLEASE CHOOSE OTHER COURSES" << endl << endl;
                     goto again;
                 }
                 else {
@@ -838,11 +870,11 @@ void function::viewApplication() {
     cout << "                                            -view application-                                         " << endl;
     cout << "=======================================================================================================" << endl << endl;
 
-    cout << "=================================================================================================================" << endl;
-    cout << "|                                                 APPLICATION INFO                                              |" << endl;
-    cout << "|---------------------------------------------------------------------------------------------------------------|" << endl;
-    cout << "| Course Code | Course Name                                                                      |              |" << endl;
-    cout << "|===============================================================================================================|" << endl;
+    cout << "==================================================================================================" << endl;
+    cout << "|                                        APPLICATION INFO                                        |" << endl;
+    cout << "|------------------------------------------------------------------------------------------------|" << endl;
+    cout << "| Course Code | Course Name                                                                      |" << endl;
+    cout << "|================================================================================================|" << endl;
 
     //display course 1
     string facultyQuery1 = "select programme_code, programme_name from courses where programme_code in(select course1 from application where student_id = '" + stuID + "')";
@@ -851,8 +883,8 @@ void function::viewApplication() {
     if (!qstate) {
         res = mysql_store_result(conn);
         while (row = mysql_fetch_row(res)) {
-            cout << left << "| " << setw(11) << row[0] << " | " << setw(81) << row[1] << "| " << setw(13) << "APPROVED" << "|" << endl;
-            cout << "|---------------------------------------------------------------------------------------------------------------|" << endl;
+            cout << left << "| " << setw(11) << row[0] << " | " << setw(81) << row[1] << "| "  << endl;
+            cout << "|------------------------------------------------------------------------------------------------|" << endl;
         }
     }
     //display course 2
@@ -862,8 +894,8 @@ void function::viewApplication() {
     if (!qstate) {
         res = mysql_store_result(conn);
         while (row = mysql_fetch_row(res)) {
-            cout << left << "| " << setw(11) << row[0] << " | " << setw(81) << row[1] << "| " << setw(13) << "APPROVED" << "|" << endl;
-            cout << "|---------------------------------------------------------------------------------------------------------------|" << endl;
+            cout << left << "| " << setw(11) << row[0] << " | " << setw(81) << row[1] << "| " << endl;
+            cout << "|------------------------------------------------------------------------------------------------|" << endl;
         }
     }
     //display course 3
@@ -873,8 +905,8 @@ void function::viewApplication() {
     if (!qstate) {
         res = mysql_store_result(conn);
         while (row = mysql_fetch_row(res)) {
-            cout << left << "| " << setw(11) << row[0] << " | " << setw(81) << row[1] << "| " << setw(13) << "APPROVED" << "|" << endl;
-            cout << "=================================================================================================================" << endl << right;
+            cout << left << "| " << setw(11) << row[0] << " | " << setw(81) << row[1] << "| " << endl;
+            cout << "|================================================================================================|" << endl << right;
         }
     }
 }
@@ -891,12 +923,49 @@ void function::applicationResult() {
     cout << "                                           -application result-                                        " << endl;
     cout << "=======================================================================================================" << endl << endl;
 
-    
+    string result, makeApplication;
+
+    string getResult = "select student_id,IFNULL(application_result, 0), make_application from studentdetails where student_id = '" + stuID + "'";
+    const char* grQuery = getResult.c_str();
+    qstate = mysql_query(conn, grQuery);
+    if (!qstate) {
+        res = mysql_store_result(conn);
+        if (res->row_count == 1) { //
+            while (row = mysql_fetch_row(res)) {
+                result = row[1];
+                makeApplication = row[2];
+            }
+        }
+        if ((result == "0") && (makeApplication == "2")) {  // IF "NULL"/0 MEANS THAT THE STUDENT DID NOT MANAGE TO GET COURSES THEY WANTED
+            cout << setw(73) << "We are sorry to inform you that your application are "; WriteInColor(12, "NOT SUCCESSFUL"); WriteInColor(7, "."); cout << endl;
+        }
+        else if (makeApplication == "1") {
+            cout << setw(73); WriteInColor(10, "Please wait until the admin approve your course. :) Thankyou for understanding!"); WriteInColor(7, ".");  cout << endl;
+        }
+        else { //
+            string displayResult = "select programme_code, programme_name from courses where programme_code in(select application_result from studentdetails where student_id = '" + stuID + "')";
+            const char* drQuery = displayResult.c_str();
+            qstate = mysql_query(conn, drQuery);
+            if (!qstate) {
+                res = mysql_store_result(conn);
+                while (row = mysql_fetch_row(res)) {
+                    cout << setw(73) << "We are happy to inform you that your application is "; WriteInColor(10, "SUCCESSFUL"); WriteInColor(7, "."); cout << endl << endl;
+                    cout << "Course Code : " << row[0] << endl;
+                    cout << "Course Name : " << row[1] << endl;                    
+                }
+            }
+        }
+    }
+    else {
+        cout << "Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
+    }
+
+
 }
 //End of application result function
 
 
-//Start of admin login function (TABLE NOT CREATED YET)
+//Start of admin login function 
 int function::adminLogin() {
 
     int count = 0;
@@ -908,7 +977,7 @@ int function::adminLogin() {
     cout << "                               ADMIN LOGIN                              " << endl;
     cout << "========================================================================" << endl;
     cout << "Enter Admin Username : ";
-    cin.ignore();
+    //cin.ignore();
     getline(cin, adminName);
 
     cout << "Enter Admin Password : ";
@@ -986,7 +1055,7 @@ int function::adminLogin() {
         }
     }
 }
-//End of admin login function (TABLE NOT CREATED YET)
+//End of admin login function 
 
 
 //start of admin menu function
@@ -1085,37 +1154,53 @@ void function::adminViewGraph() {
         stuApp >> y; 
         // END OF CASTING, CHANGE STRING TO INT
 
-        cout << setw(50) << " +--------------+ " << endl;
-        cout << setw(50) << " |  Bar graphs  | " << endl;
-        cout << setw(50) << " +--------------+ " << endl << endl;
+        cout << setw(62) << " +--------------+ " << endl;
+        cout << setw(62) << " |  Bar graphs  | " << endl;
+        cout << setw(62) << " +--------------+ " << endl << endl ;
 
-        cout << "Registered Students : ";
-        cout << left << setw(36);
+        cout << right << setw(46) << "|" << endl;
+        cout << setw(47) << right << "Registered Students | " << setw(1) << left; //cout << setw(31) << right << " |" << endl;
         WriteInColor(11, "");
-        for (int j = 1; j <= x; j++) { //j <= Number of registered student
-            cout << char(219); //display bar
-            if (j == x) {
-                WriteInColor(7, "  ");
-                cout << j << endl << endl;
+        if (x == 0) {
+            WriteInColor(7, "  ");
+            cout << endl;
+        }
+        else {
+            for (int j = 1; j <= x; j++) { // j <= Number of student who already apply for courses
+                cout << char(219); //display bar
+                if (j == x) {
+                    WriteInColor(7, "  ");
+                    cout << j << endl;
+                }
             }
         }
-        cout << "Student who havent make application : ";
-        cout << left << setw(20);
+
+        cout << right << setw(46) << "|" << endl;
+        cout << setw(47) << right << "Student who have applied 3 courses | " << setw(1) << left;
         WriteInColor(11, "");
-        for (int j = 1; j <= y; j++) { // j <= Number of student who already apply for courses
-            cout << char(219); //display bar
-            if (j == y) {
-                WriteInColor(7, "  ");
-                cout << j << endl << endl;
+        if (y == 0) {
+            WriteInColor(7, "  ");
+            cout << endl;
+        }
+        else {
+            for (int j = 1; j <= y; j++) { // j <= Number of student who already apply for courses
+                cout << char(219); //display bar
+                if (j == y) {
+                    WriteInColor(7, "  ");
+                    cout << j << endl;
+                }
             }
         }
+        cout << right << setw(118) << "|------------------------------------------------------> num. of students" << endl;
+
     }
     else if (graphSelect == 2) { //View Total Number of Students In Each Faculty
         adminViewGraphMenu();
         string facultyAviation, facultyCS, facultyChemical, facultyBusiness,facultyHealth;
+        string approvedAviation, approvedCS, approvedChemical, approvedBusiness, approvedHealth;
 
         //START OF GET NUMBER OF STUDENTS IN AVIATION
-        string countStudentFaculty1 = "SELECT IFNULL(SUM(numOfStudent), 0) FROM courses where faculty_id = 1";
+        string countStudentFaculty1 = "SELECT IFNULL(SUM(numOfStudent), 0),IFNULL(SUM(approvedStudent), 0) FROM courses where faculty_id = 1";
         const char* csfQuery1 = countStudentFaculty1.c_str();
         qstate = mysql_query(conn, csfQuery1);
         if (!qstate) {
@@ -1123,13 +1208,14 @@ void function::adminViewGraph() {
             if (res->row_count == 1) { //
                 while (row = mysql_fetch_row(res)) {
                     facultyAviation = row[0];
+                    approvedAviation = row[1];
                 }
             }
         }
         //END OF GET NUMBER OF STUDENTS IN AVIATION
 
         //START OF GET NUMBER OF STUDENTS IN COMP SCIENCE
-        string countStudentFaculty2 = "SELECT IFNULL(SUM(numOfStudent), 0) FROM courses where faculty_id = 2";
+        string countStudentFaculty2 = "SELECT IFNULL(SUM(numOfStudent), 0),IFNULL(SUM(approvedStudent), 0) FROM courses where faculty_id = 2";
         const char* csfQuery2 = countStudentFaculty2.c_str();
         qstate = mysql_query(conn, csfQuery2);
         if (!qstate) {
@@ -1137,13 +1223,14 @@ void function::adminViewGraph() {
             if (res->row_count == 1) { //
                 while (row = mysql_fetch_row(res)) {
                     facultyCS = row[0];
+                    approvedCS = row[1];
                 }
             }
         }
         //END OF GET NUMBER OF STUDENTS IN COMP SCIENCE
 
         //START OF GET NUMBER OF STUDENTS IN CHEMICAL ENGINEERING
-        string countStudentFaculty3 = "SELECT IFNULL(SUM(numOfStudent), 0) FROM courses where faculty_id = 3";
+        string countStudentFaculty3 = "SELECT IFNULL(SUM(numOfStudent), 0),IFNULL(SUM(approvedStudent), 0) FROM courses where faculty_id = 3";
         const char* csfQuery3 = countStudentFaculty3.c_str();
         qstate = mysql_query(conn, csfQuery3);
         if (!qstate) {
@@ -1151,13 +1238,14 @@ void function::adminViewGraph() {
             if (res->row_count == 1) { //
                 while (row = mysql_fetch_row(res)) {
                     facultyChemical = row[0];
+                    approvedChemical = row[1];
                 }
             }
         }
         //END OF GET NUMBER OF STUDENTS IN CHEMICAL ENGINEERING
 
         //START OF GET NUMBER OF STUDENTS IN BUSINESS/ACCOUNT
-        string countStudentFaculty4 = "SELECT IFNULL(SUM(numOfStudent), 0) FROM courses where faculty_id = 4";
+        string countStudentFaculty4 = "SELECT IFNULL(SUM(numOfStudent), 0),IFNULL(SUM(approvedStudent), 0) FROM courses where faculty_id = 4";
         const char* csfQuery4 = countStudentFaculty4.c_str();
         qstate = mysql_query(conn, csfQuery4);
         if (!qstate) {
@@ -1165,13 +1253,14 @@ void function::adminViewGraph() {
             if (res->row_count == 1) { //
                 while (row = mysql_fetch_row(res)) {
                     facultyBusiness = row[0];
+                    approvedBusiness = row[1];
                 }
             }
         }
         //END OF GET NUMBER OF STUDENTS IN BUSINESS/ACCOUNT
 
         //START OF GET NUMBER OF STUDENTS IN HEALTH SCIENCES
-        string countStudentFaculty5 = "SELECT IFNULL(SUM(numOfStudent), 0) FROM courses where faculty_id = 5";
+        string countStudentFaculty5 = "SELECT IFNULL(SUM(numOfStudent), 0),IFNULL(SUM(approvedStudent), 0) FROM courses where faculty_id = 5";
         const char* csfQuery5 = countStudentFaculty5.c_str();
         qstate = mysql_query(conn, csfQuery5);
         if (!qstate) {
@@ -1179,24 +1268,234 @@ void function::adminViewGraph() {
             if (res->row_count == 1) { //
                 while (row = mysql_fetch_row(res)) {
                     facultyHealth = row[0];
+                    approvedHealth = row[1];
                 }
             }
         }
         //END OF GET NUMBER OF STUDENTS IN HEALTH SCIENCES
 
-        cout << "Faculty 1 : " << facultyAviation << endl;
-        cout << "Faculty 2 : " << facultyCS << endl;
-        cout << "Faculty 3 : " << facultyChemical << endl;
-        cout << "Faculty 4 : " << facultyBusiness << endl;
-        cout << "Faculty 5 : " << facultyHealth << endl;
 
+        //CASTING, CHANGE STRING TO INT
+        stringstream avi(facultyAviation); //Number of registered student
+        int a = 0;
+        avi >> a;
+        stringstream cs(facultyCS); //Number of student who already apply for courses
+        int b = 0;
+        cs >> b;
+        stringstream ch(facultyChemical); //Number of student who already apply for courses
+        int c = 0;
+        ch >> c;
+        stringstream bs(facultyBusiness); //Number of student who already apply for courses
+        int d = 0;
+        bs >> d;
+        stringstream h(facultyHealth); //Number of student who already apply for courses
+        int e = 0;
+        h >> e;
+        // END OF CASTING, CHANGE STRING TO INT
+        cout << endl << endl << endl;
+        cout << setw(92) << " +-----------------------------------------------------------+ " << endl;
+        cout << setw(92) << " |  Graph : Total number of students apply for each faculty  | " << endl;
+        cout << setw(92) << " +-----------------------------------------------------------+ " << endl << endl;
+
+        cout << right << setw(46) << "|" << endl;
+        cout << setw(47) << right << "Faculty of Aviation | " << setw(1) << left; //cout << setw(31) << right << " |" << endl;
+        WriteInColor(11, "");
+        if (a == 0) {
+            WriteInColor(7, "  ");
+            cout << endl;
+        }
+        else {
+            for (int j = 1; j <= a; j++) { // j <= Number of student who already apply for courses
+                cout << char(219); //display bar
+                if (j == a) {
+                    WriteInColor(7, "  ");
+                    cout << j << endl;
+                }
+            }
+        }
+
+        cout << right << setw(46) << "|" << endl;
+        cout << setw(47) << right << "Faculty of Computer Science & Mathematics | " << setw(1) << left;
+        WriteInColor(11, "");
+        if (b == 0) {
+            WriteInColor(7, "  ");
+            cout << endl;
+        }
+        else {
+            for (int j = 1; j <= b; j++) { // j <= Number of student who already apply for courses
+                cout << char(219); //display bar
+                if (j == b) {
+                    WriteInColor(7, "  ");
+                    cout << j << endl;
+                }
+            }
+        }
+
+        cout << right << setw(46) << "|" << endl;
+        cout << setw(47) << right << "Faculty of Chemical Engineering | " << setw(1) << left;
+        WriteInColor(11, "");
+        if (c == 0) {
+            WriteInColor(7, "  ");
+            cout << endl;
+        }
+        else {
+            for (int j = 1; j <= c; j++) { // j <= Number of student who already apply for courses
+                cout << char(219); //display bar
+                if (j == c) {
+                    WriteInColor(7, "  ");
+                    cout << j << endl;
+                }
+            }
+        }
+
+        cout << right << setw(46) << "|" << endl;
+        cout << setw(47) << right << "Faculty of Business and Accountancy | " << setw(1) << left;
+        WriteInColor(11, "");
+        if (d == 0) {
+            WriteInColor(7, "  ");
+            cout << endl;
+        }
+        else {
+            for (int j = 1; j <= d; j++) { // j <= Number of student who already apply for courses
+                cout << char(219); //display bar
+                if (j == d) {
+                    WriteInColor(7, "  ");
+                    cout << j << endl;
+                }
+            }
+        }
+
+        cout << right << setw(46) << "|" << endl;
+        cout << setw(47) << right << "Faculty of Health Sciences | " << setw(1) << left;
+        WriteInColor(11, "");
+        if (e == 0) {
+            WriteInColor(7, "  ");
+            cout << endl;
+        }
+        else {
+            for (int j = 1; j <= e; j++) { // j <= Number of student who already apply for courses
+                cout << char(219); //display bar
+                if (j == e) {
+                    WriteInColor(7, "  ");
+                    cout << j << endl;
+                }
+            }
+        }
+        cout << right << setw(118) << "|------------------------------------------------------> num. of students" << endl << endl << endl;
+
+        //CASTING, CHANGE STRING TO INT
+        stringstream avi2(approvedAviation); //Number of registered student
+        int a2 = 0;
+        avi2 >> a2;
+        stringstream cs2(approvedCS); //Number of student who already apply for courses
+        int b2 = 0;
+        cs2 >> b2;
+        stringstream ch2(approvedChemical); //Number of student who already apply for courses
+        int c2 = 0;
+        ch2 >> c2;
+        stringstream bs2(approvedBusiness); //Number of student who already apply for courses
+        int d2 = 0;
+        bs2 >> d2;
+        stringstream h2(approvedHealth); //Number of student who already apply for courses
+        int e2 = 0;
+        h2 >> e2;
+        // END OF CASTING, CHANGE STRING TO INT
+
+        cout << setw(92) << " +-------------------------------------------------------------+ " << endl;
+        cout << setw(92) << " |  Graph : Total number of students approved in each faculty  | " << endl;
+        cout << setw(92) << " +-------------------------------------------------------------+ " << endl << endl;
+
+        cout << right << setw(46) << "|" << endl;
+        cout << setw(47) << right << "Faculty of Aviation | " << setw(1) << left; //cout << setw(31) << right << " |" << endl;
+        WriteInColor(11, "");
+        if (a2 == 0) {
+            WriteInColor(7, "  ");
+            cout << endl;
+        }
+        else {
+            for (int j = 1; j <= a2; j++) { // j <= Number of student who already apply for courses
+                cout << char(219); //display bar
+                if (j == a2) {
+                    WriteInColor(7, "  ");
+                    cout << j << endl;
+                }
+            }
+        }
+
+        cout << right << setw(46) << "|" << endl;
+        cout << setw(47) << right << "Faculty of Computer Science & Mathematics | " << setw(1) << left;
+        WriteInColor(11, "");
+        if (b2 == 0) {
+            WriteInColor(7, "  ");
+            cout << endl;
+        }
+        else {
+            for (int j = 1; j <= b2; j++) { // j <= Number of student who already apply for courses
+                cout << char(219); //display bar
+                if (j == b2) {
+                    WriteInColor(7, "  ");
+                    cout << j << endl;
+                }
+            }
+        }
+
+        cout << right << setw(46) << "|" << endl;
+        cout << setw(47) << right << "Faculty of Chemical Engineering | " << setw(1) << left;
+        WriteInColor(11, "");
+        if (c2 == 0) {
+            WriteInColor(7, "  ");
+            cout << endl;
+        }
+        else {
+            for (int j = 1; j <= c2; j++) { // j <= Number of student who already apply for courses
+                cout << char(219); //display bar
+                if (j == c2) {
+                    WriteInColor(7, "  ");
+                    cout << j << endl;
+                }
+            }
+        }
+
+        cout << right << setw(46) << "|" << endl;
+        cout << setw(47) << right << "Faculty of Business and Accountancy | " << setw(1) << left;
+        WriteInColor(11, "");
+        if (d2 == 0) {
+            WriteInColor(7, "  ");
+            cout << endl;
+        }
+        else {
+            for (int j = 1; j <= d2; j++) { // j <= Number of student who already apply for courses
+                cout << char(219); //display bar
+                if (j == d2) {
+                    WriteInColor(7, "  ");
+                    cout << j << endl;
+                }
+            }
+        }
+
+        cout << right << setw(46) << "|" << endl;
+        cout << setw(47) << right << "Faculty of Health Sciences | " << setw(1) << left;
+        WriteInColor(11, "");
+        if (e2 == 0) {
+            WriteInColor(7, "  ");
+            cout << endl;
+        }
+        else {
+            for (int j = 1; j <= e2; j++) { // j <= Number of student who already apply for courses
+                cout << char(219); //display bar
+                if (j == e2) {
+                    WriteInColor(7, "  ");
+                    cout << j << endl;
+                }
+            }
+        }
+        
+        cout << right << setw(127) << "|------------------------------------------------------> num. of approved students" << endl;
+    }
+    else if (graphSelect == 3) {
+        adminStudentListMenu();
     }
 
-
-
-    
-    
-    
 }
 //end of admin view graph function
 
@@ -1225,41 +1524,136 @@ void function::adminStudentListMenu() {
 void function::adminViewStudentList() {
 
     adminStudentListMenu();
-    int listSelect = 0;
+    int listSelect = 0, check = 2;
 
     arrowKeySelection arrow;
     listSelect = arrow.adminStudentListSelection();
 
-    if (listSelect == 1) { //List Of Student Based On GENDER
+    if (listSelect == 1) { //List Of Registered Students
         adminStudentListMenu();
-        cout << "Select student gender :";
-        int gender = arrow.maleOrFemale();
-        if (gender == 1) { //Male
-            system("cls");
-            adminStudentListMenu();
-
-            cout << "List Of Male Student";
-        }else if (gender == 2) { //Female
-            system("cls");
-            adminStudentListMenu();
-
-            cout << "List Of Female Student";
+        // SELECT * FROM result WHERE student_id = 1 AND semester = (SELECT MAX(semester) FROM result)               --> get cgpa
+        string displayRegisteredStudent = "SELECT student.*, studentdetails.* FROM student JOIN studentdetails on student.student_id = studentdetails.student_id";
+        const char* dsaQuery = displayRegisteredStudent.c_str();
+        qstate = mysql_query(conn, dsaQuery);
+        if (!qstate) {
+            res = mysql_store_result(conn);
+            cout << setw(82) << "LIST OF REGISTERED STUDENT WHO HAVE INSERTED STUDENT DETAILS" << endl;
+            cout << setw(106) << "==================================================================================================" << endl;
+            cout << setw(106) << "| Student ID |           Username           |     IC_Number     |   Gender   |  Education Level  |" << endl;
+            cout << setw(106) << "==================================================================================================" << endl;
+            while (row = mysql_fetch_row(res)) {
+                cout << setw(9) << "|" << setw(11) << row[0] << " |" << setw(29) << row[1] << " |" << setw(18) << row[2] << " |" << setw(11) << row[3] << " |" << setw(18) << row[12] << " |" << endl;
+            }
+            cout << setw(106) << "==================================================================================================" << endl << endl << endl;
         }
+        else {
+            cout << "Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
+        }
+        
     }else if (listSelect == 2) { //List Of Student Based On EDUCATION LEVEL
         adminStudentListMenu();
-        cout << "EDUCATION LEVEL";
-    }
-    else if (listSelect == 3) { //List Of Student Based On WORK EXPERIENCE
-        adminStudentListMenu();
-    }
-    else if (listSelect == 4) { //List Of Student Based On AGE
-        adminStudentListMenu();
-    }
-    else if (listSelect == 5) { //Back to Admin Main Menu
-        adminStudentListMenu();
-        return;
-    }
+        string edu;
+        cout << setw(62) << "Choose education level" << endl;
+        int eduSelect = arrow.eduLevelSelection(check);
+        if (eduSelect == 1)
+            edu = "Diploma";
+        else if (eduSelect == 2)
+            edu = "STPM";
+        else if (eduSelect == 3)
+            edu = "Matriculation";
+        else if (eduSelect == 4)
+            edu = "Foundation";
+        else if (eduSelect == 5)
+            edu = " A-Level";
 
+        system("cls");
+        adminStudentListMenu();
+
+        string displayRegisteredStudent = "SELECT student.*, studentdetails.* FROM student JOIN studentdetails on student.student_id = studentdetails.student_id"
+                                          " WHERE education_level = '" + edu + "'";
+        const char* dsaQuery = displayRegisteredStudent.c_str();
+        qstate = mysql_query(conn, dsaQuery);
+        if (!qstate) {
+            res = mysql_store_result(conn);
+            cout << setw(76) << "LIST OF STUDENT BASED ON EDUCATION LEVEL" << endl;
+            cout << setw(106) << "==================================================================================================" << endl;
+            cout << setw(106) << "| Student ID |           Username           |     IC_Number     |   Gender   |  Education Level  |" << endl;
+            cout << setw(106) << "==================================================================================================" << endl;
+            while (row = mysql_fetch_row(res)) {
+                cout << setw(9) << "|" << setw(11) << row[0] << " |" << setw(29) << row[1] << " |" << setw(18) << row[2] << " |" << setw(11) << row[3] << " |" << setw(18) << row[12] << " |" << endl;
+            }
+            cout << setw(106) << "==================================================================================================" << endl << endl << endl;
+        }
+        else {
+            cout << "Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
+        }
+    }
+    else if (listSelect == 3) { //View List Of Approved Student Based on COURSES
+        adminStudentListMenu();
+        string courseCode, courseName;
+        check = 1;
+        int fselect = arrow.facultySelection(check);
+        string fs = to_string(fselect); // change int to string
+
+        system("cls");
+        adminStudentListMenu();
+        string facultyQuery = "select * from courses where faculty_id = '" + fs + "'";
+        const char* fQuery = facultyQuery.c_str();
+        qstate = mysql_query(conn, fQuery);
+        if (!qstate) {
+            res = mysql_store_result(conn);
+            while (row = mysql_fetch_row(res)) {
+                cout << "Course Code : " << row[2] << setw(20) << "Course Name : " << row[3] << endl;
+            }
+        }
+        else {
+            cout << "Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
+        }
+
+        cout << endl << endl;
+        cout << setw(62) << "SELECT COURSE CODE TO VIEW TABLE ==> ";
+        cin >> courseCode;
+
+        system("cls");
+        adminStudentListMenu();
+
+        string getCourseName = "select programme_name from courses where programme_code = '" + courseCode + "'";
+        const char* gcnQuery = getCourseName.c_str();
+        qstate = mysql_query(conn, gcnQuery);
+        if (!qstate) {
+            res = mysql_store_result(conn);
+            while (row = mysql_fetch_row(res)) {
+                courseName = row[0];
+            }
+        }
+        else {
+            cout << "Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
+        }
+
+        string displayRegisteredStudent = "SELECT student.*, studentdetails.* FROM student JOIN studentdetails on student.student_id = studentdetails.student_id"
+            " WHERE application_result = '" + courseCode + "'";
+        const char* dsaQuery = displayRegisteredStudent.c_str();
+        qstate = mysql_query(conn, dsaQuery);
+        if (!qstate) {
+            res = mysql_store_result(conn);
+            cout  << courseName << endl;
+            cout  << "==================================================================================================" << endl;
+            cout  << "| Student ID |           Username           |     IC_Number     |   Gender   |  Education Level  |" << endl;
+            cout  << "==================================================================================================" << endl;
+            while (row = mysql_fetch_row(res)) {
+                cout  << "|" << setw(11) << row[0] << " |" << setw(29) << row[1] << " |" << setw(18) << row[2] << " |" << setw(11) << row[3] << " |" << setw(18) << row[12] << " |" << endl;
+            }
+            cout  << "==================================================================================================" << endl << endl << endl;
+            
+        }
+        else {
+            cout << "Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
+        }
+
+    }
+    else if (listSelect == 4) { //Back to Admin Main Menu
+        adminStudentListMenu();
+    }
 }
 //end of admin view list of student function
 
@@ -1308,7 +1702,8 @@ void function::adminApproval() {
     cout << "\n\n";
     string check;
     // ADD SQL CHECK IF STUDENT ID TAKDE, DIA TANYA AGAIN
-    string checkQ = "SELECT EXISTS(select studentdetails.student_id from studentdetails where studentdetails.make_application = 1 and studentdetails.student_id= '" + studentID + "')";
+    string checkQ = "SELECT EXISTS(select studentdetails.student_id from studentdetails"
+                    "where studentdetails.make_application = 1 and studentdetails.student_id= '" + studentID + "')";
     const char* checkQuery = checkQ.c_str();
     qstate = mysql_query(conn, checkQuery);
     if (!qstate) {
@@ -1340,7 +1735,7 @@ void function::adminApproval() {
 
         string student_username, student_fullname, ic_num, work_exp, cgpa;
         string recommendedCGPA, minimumCGPA, minimumWork_exp;
-        string course1 = "", course2 = "", course3 = "", approvedCourse, availability;
+        string course1 = "", course2 = "", course3 = "", approvedCourse;
         double doubleCGPA = 0;
         int intWork_exp = 0, count=0;
 
@@ -1427,7 +1822,7 @@ void function::adminApproval() {
                     cout << "|---------------------------------------------------------------------------------------------------------------|" << endl;
                 }
                 else if( ((doubleCGPA < recomendCGPA) && (doubleCGPA >= minCGPA)) && (intWork_exp > minWorkExp) ){
-                    cout << left << "| " << setw(11) << row[2] << " | " << setw(81) << row[3] << "| " << setw(13); WriteInColor(11, "YES"); WriteInColor(7,""); cout << "|" << endl;
+                    cout << left << "| " << setw(11) << row[2] << " | " << setw(81) << row[3] << "| " << setw(13); WriteInColor(14, "YES"); WriteInColor(7,""); cout << "|" << endl;
                     cout << "|---------------------------------------------------------------------------------------------------------------|" << endl;
                 }
                 else {
@@ -1466,7 +1861,7 @@ void function::adminApproval() {
                     cout << "|---------------------------------------------------------------------------------------------------------------|" << endl;
                 }
                 else if (((doubleCGPA < recomendCGPA) && (doubleCGPA >= minCGPA)) && (intWork_exp > minWorkExp)) {
-                    cout << left << "| " << setw(11) << row[2] << " | " << setw(81) << row[3] << "| " << setw(13); WriteInColor(11, "YES"); WriteInColor(7, ""); cout << "|" << endl;
+                    cout << left << "| " << setw(11) << row[2] << " | " << setw(81) << row[3] << "| " << setw(13); WriteInColor(14, "YES"); WriteInColor(7, ""); cout << "|" << endl;
                     cout << "|---------------------------------------------------------------------------------------------------------------|" << endl;
                 }
                 else {
@@ -1504,7 +1899,7 @@ void function::adminApproval() {
                     cout << left << "| " << setw(11) << row[2] << " | " << setw(81) << row[3] << "| " << setw(13); WriteInColor(10, "YES"); WriteInColor(7, ""); cout << "|" << endl;
                     cout << "=================================================================================================================" << endl << right << endl;
                 }
-                else if (((doubleCGPA < recomendCGPA) && (2.3 >= minCGPA)) && (intWork_exp > minWorkExp)) {
+                else if (((doubleCGPA < recomendCGPA) && (doubleCGPA >= minCGPA)) && (intWork_exp > minWorkExp)) {
                     cout << left << "| " << setw(11) << row[2] << " | " << setw(81) << row[3] << "| " << setw(13); WriteInColor(14, "YES"); WriteInColor(7, ""); cout << "|" << endl;
                     cout << "=================================================================================================================" << endl << right << endl;
                 }
@@ -1561,11 +1956,11 @@ void function::adminApproval() {
                                 cout << endl << setw(55) << "COURSE APPROVED" << endl;
                             }
                             else {
-                                cout << "aaaaaa Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
+                                cout << "Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
                             }
                         }
                         else {
-                            cout << "bbbbbb Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
+                            cout << "Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
                         }
                     }
                 }

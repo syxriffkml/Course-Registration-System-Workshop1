@@ -4,6 +4,7 @@
 #include <conio.h> //using getch
 #include <windows.h> //windows library (WARNING : ONLY WORKS IN WINDOWS)
 #include <string>
+#include <iomanip>
 #include <mysql.h>
 #include "function.h" // functions header
 #include "arrowKeySelection.h" // menu arrow keys selection function header
@@ -14,12 +15,16 @@
 
 using namespace std;
 
+extern int qstate;
+extern MYSQL* conn;
+extern MYSQL_ROW row;
+extern MYSQL_RES* res;
+
+extern string stuID, username, subjectID, adminID, adminUser;
+
+
 int main() {
     //fixed console size   
-    HWND console = GetConsoleWindow();
-    RECT r;
-    GetWindowRect(console, &r); //stores the console's current dimensions
-    MoveWindow(console, r.left, r.top, 1100, 700, TRUE); // 870 width, 800 height
     system("color 0f"); //0-black bg, f- white text
     //end of fixed console size
 
@@ -45,45 +50,108 @@ int main() {
                 goto start;
             }
             do {// STUDENT MENU LOOP
-                f.studentMenu();
-                studentSelection = arrowKey.studentPageSelection();
-                if (studentSelection == 1) {
-                    f.displayFacultyAndCourses();
-                    cout << "\nPress 8 to go back to student menu : ";
-                    cin >> backToStudentMenu;
-                    system("cls");
-                }else if (studentSelection == 2) { //insert personal detail
-                    f.studentDetail();
-                    cout << "\nPress 8 to go back to student menu : ";
-                    cin >> backToStudentMenu;
-                    system("cls");
-                }else if (studentSelection == 3) { // view and edit personal details
-                    f.editStudentDisplay();
-                    cout << "\nPress 8 to go back to student menu : ";
-                    cin >> backToStudentMenu;
-                    system("cls");
-                }else if (studentSelection == 4) { // calculate cgpa
-                    f.addGrades();
-                    cout << "\nPress 8 to go back to student menu : ";
-                    cin >> backToStudentMenu;
-                    system("cls");
+                
+                string c1,c2,c3;
+                string checkQ = "SELECT EXISTS(select * from studentdetails where studentdetails.student_id= '" + stuID + "')";
+                const char* checkQuery = checkQ.c_str();
+                qstate = mysql_query(conn, checkQuery);
+                if (!qstate) {
+                    res = mysql_store_result(conn);
+                    if (res->row_count == 1) {
+                        while (row = mysql_fetch_row(res)) {
+                            c1 = row[0];
+                        }
+                    }
+                    if (c1 == "0") {
+                        f.studentDetail();
+                        backToStudentMenu = 1;
+                        system("cls");
+                    }
+                    else if (c1 == "1") {
+                        string checkQ = "SELECT EXISTS(select * from result where result.student_id= '" + stuID + "')";
+                        const char* checkQuery = checkQ.c_str();
+                        qstate = mysql_query(conn, checkQuery);
+                        if (!qstate) {
+                            res = mysql_store_result(conn);
+                            if (res->row_count == 1) {
+                                while (row = mysql_fetch_row(res)) {
+                                    c2 = row[0];
+                                }
+                            }
+                            if (c2 == "0") {
+                                f.addGrades();
+                                backToStudentMenu = 1;
+                                system("cls");
+                            }
+                            else if (c2 == "1") {
+                                f.studentMenu();
+                                studentSelection = arrowKey.studentPageSelection();
+
+                                if (studentSelection == 1) {
+                                    f.displayFacultyAndCourses();
+                                    cout << "\nPress 1 to go back to student menu : ";
+                                    cin >> backToStudentMenu;
+                                    system("cls");
+                                }
+                                else if (studentSelection == 2) { // view and edit personal details
+                                    f.editStudentDisplay();
+                                    cout << "\nPress 1 to go back to student menu : ";
+                                    cin >> backToStudentMenu;
+                                    system("cls");
+                                }
+                                else if (studentSelection == 3) { // apply 3 courses
+                                    string checkQ = "SELECT EXISTS(select * from application where application.student_id= '" + stuID + "')";
+                                    const char* checkQuery = checkQ.c_str();
+                                    qstate = mysql_query(conn, checkQuery);
+                                    if (!qstate) {
+                                        res = mysql_store_result(conn);
+                                        if (res->row_count == 1) {
+                                            while (row = mysql_fetch_row(res)) {
+                                                c3 = row[0];
+                                            }
+                                        }
+                                    }
+                                    if (c3 == "0") {
+                                        f.application();
+                                        cout << "\nPress 1 to go back to student menu : ";
+                                        cin >> backToStudentMenu;
+                                        system("cls");
+                                    }
+                                    else {
+                                        f.applicationMenu();
+                                        cout << setw(62) << "YOU HAVE MADE AN APPLICATION" << endl;
+                                        cout << "\nPress 1 to go back to student menu : ";
+                                        cin >> backToStudentMenu;
+                                        system("cls");
+                                    }
+                                    
+                                }
+                                else if (studentSelection == 4) { // view application
+                                    f.viewApplication();
+                                    cout << "\nPress 1 to go back to student menu : ";
+                                    cin >> backToStudentMenu;
+                                    system("cls");
+                                }
+                                else if (studentSelection == 5) { // view application
+                                    f.applicationResult();
+                                    cout << "\nPress 1 to go back to student menu : ";
+                                    cin >> backToStudentMenu;
+                                    system("cls");
+                                }
+                                else if (studentSelection == 6) { // "logout"
+                                    goto start;
+                                }
+                            }
+                        }
+                        else {
+                            cout << "Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
+                        }
+                    }
                 }
-                else if (studentSelection == 5) { // apply 3 courses
-                    f.application();
-                    cout << "\nPress 8 to go back to student menu : ";
-                    cin >> backToStudentMenu;
-                    system("cls");
+                else {
+                    cout << "Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
                 }
-                else if (studentSelection == 6) { // view application
-                    f.viewApplication();
-                    cout << "\nPress 8 to go back to student menu : ";
-                    cin >> backToStudentMenu;
-                    system("cls");
-                }
-                else if (studentSelection == 8) { // "logout"
-                    goto start;
-                }
-            } while (backToStudentMenu == 8);
+            } while (backToStudentMenu == 1);
         }
         else if (loginType == 2) { //ADMIN LOGIN 
             count = f.adminLogin();
@@ -95,26 +163,26 @@ int main() {
                 adminSelection = arrowKey.adminPageSelection();
                 if (adminSelection == 1) { //VIEW GRAPHS
                     f.adminViewGraph();
-                    cout << "\nPress 8 to go back to admin menu : ";
+                    cout << "\nPress 1 to go back to admin menu : ";
                     cin >> backToAdminMenu;
                     system("cls");
                 }
                 else if (adminSelection == 2) { //VIEW LIST OF STUDENT
                     f.adminViewStudentList();
-                    cout << "\nPress 8 to go back to admin menu : ";
+                    cout << "\nPress 1 to go back to admin menu : ";
                     cin >> backToAdminMenu;
                     system("cls");
                 }
                 else if (adminSelection == 3) { //APPROVE STUDENT APPLICATION
                     f.adminApproval();
-                    cout << "\nPress 8 to go back to admin menu : ";
+                    cout << "\nPress 1 to go back to admin menu : ";
                     cin >> backToAdminMenu;
                     system("cls");
                 }
                 else if (adminSelection == 5) { //"logout"
                     goto start;
                 }
-            } while (backToAdminMenu == 8);
+            } while (backToAdminMenu == 1);
             
         }
     }

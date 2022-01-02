@@ -1,5 +1,5 @@
 #include <iostream>
-#include<sstream>
+#include <sstream>
 #include <windows.h>
 #include <conio.h> //_getch()
 #include <iomanip> //setw()
@@ -10,6 +10,7 @@
 #include "function.h" // functions header
 
 using namespace std;
+
 
 void arrowKeySelection::color(int color) {
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
@@ -145,41 +146,33 @@ int arrowKeySelection::studentPageSelection() {
 
     for (int i = 0;;) {
 
-        gotoxy(32, 9);
+        gotoxy(23, 9);
         color(Set[0]);
         cout << "1. View Available Courses";
 
-        gotoxy(32, 11);
+        gotoxy(23, 11);
         color(Set[1]);
-        cout << "2. Insert Personal Details";
+        cout << "2. View or Edit Personal Details";
 
-        gotoxy(32, 13);
+        gotoxy(23, 13);
         color(Set[2]);
-        cout << "3. View or Edit Personal Details";
+        cout << "3. Course Application";
 
-        gotoxy(32, 15);
+        gotoxy(23, 15);
         color(Set[3]);
-        cout << "4. Insert Past Result";
+        cout << "4. View Application";
 
-        gotoxy(32, 17);
+        gotoxy(23, 17);
         color(Set[4]);
-        cout << "5. Course Application";
+        cout << "5. View Application Result";
 
-        gotoxy(32, 19);
+        gotoxy(23, 19);
         color(Set[5]);
-        cout << "6. View Application";
-
-        gotoxy(32, 21);
-        color(Set[6]);
-        cout << "7. View Application Result";
-
-        gotoxy(32, 23);
-        color(Set[7]);
-        cout << "8. Logout";
+        cout << "6. Logout";
 
         key = _getch();
-        if (key == 72 && (counter >= 2 && counter <= 8)) { counter--; } //72 for arrow up key
-        if (key == 80 && (counter >= 1 && counter <= 7)) { counter++; }  //80 for arrow down key
+        if (key == 72 && (counter >= 2 && counter <= 6)) { counter--; } //72 for arrow up key
+        if (key == 80 && (counter >= 1 && counter <= 5)) { counter++; }  //80 for arrow down key
 
         if (key == '\r')//carriage return
         {   // if enter is click and highlight is on 1 the program will run the code here
@@ -201,12 +194,6 @@ int arrowKeySelection::studentPageSelection() {
             if (counter == 6) {
                 break;
             }
-            if (counter == 7) {
-                break;
-            }
-            if (counter == 8) {
-                break;
-            }
         }
         //default white
         Set[0] = 7;
@@ -215,8 +202,6 @@ int arrowKeySelection::studentPageSelection() {
         Set[3] = 7;
         Set[4] = 7;
         Set[5] = 7;
-        Set[6] = 7;
-        Set[7] = 7;
 
         //set colours during selection
         if (counter == 1) { Set[0] = 12; }
@@ -225,8 +210,6 @@ int arrowKeySelection::studentPageSelection() {
         if (counter == 4) { Set[3] = 12; }
         if (counter == 5) { Set[4] = 12; }
         if (counter == 6) { Set[5] = 12; }
-        if (counter == 7) { Set[6] = 12; }
-        if (counter == 8) { Set[7] = 12; }
     }
 
     if (counter == 1) {
@@ -251,32 +234,36 @@ int arrowKeySelection::studentPageSelection() {
     }
     else if (counter == 6) {
         system("cls");
-        return counter;
-    }
-    else if (counter == 7) {
-        system("cls");
-        return counter;
-    }
-    else if (counter == 8) {
-        system("cls");
         system("color 0f");
         return counter;
     }
 }
 
-int arrowKeySelection::maleOrFemale() {
+int arrowKeySelection::maleOrFemale(int& check) {
     int Set[] = { 12,7 }; // DEFAULT COLORS
     int counter = 1;
     char key;
-
+    
     for (int i = 0;;) {
-        gotoxy(25, 16);
-        color(Set[0]);
-        cout << "1. Male";
 
-        gotoxy(37, 16);
-        color(Set[1]);
-        cout << "2. Female";
+        if (check == 1) {
+            gotoxy(33, 8);
+            color(Set[0]);
+            cout << "1. Male";
+
+            gotoxy(45, 8);
+            color(Set[1]);
+            cout << "2. Female";
+        }
+        else if (check == 2) {
+            gotoxy(25, 16);
+            color(Set[0]);
+            cout << "1. Male";
+
+            gotoxy(37, 16);
+            color(Set[1]);
+            cout << "2. Female";
+        }
 
         key = _getch();
         if (key == 75 && (counter >= 2 && counter <= 2)) { counter--; } //75 for arrow left key
@@ -377,32 +364,56 @@ int arrowKeySelection::maritalStatusSelection() {
     }
 }
 
-int arrowKeySelection::eduLevelSelection() {
+int arrowKeySelection::eduLevelSelection(int& check) {
 
     int Set[] = { 12,7,7,7,7 }; // DEFAULT COLORS
     int counter = 1;
     char key;
 
     for (int i = 0;;) {
-        gotoxy(31, 18);
-        color(Set[0]);
-        cout << "1. Diploma";
+        if (check == 1) {
+            gotoxy(31, 18);
+            color(Set[0]);
+            cout << "1. Diploma";
 
-        gotoxy(44, 18);
-        color(Set[1]);
-        cout << "2. STPM";
+            gotoxy(44, 18);
+            color(Set[1]);
+            cout << "2. STPM";
 
-        gotoxy(54, 18);
-        color(Set[2]);
-        cout << "3. Matriculation";
+            gotoxy(54, 18);
+            color(Set[2]);
+            cout << "3. Matriculation";
 
-        gotoxy(73, 18);
-        color(Set[3]);
-        cout << "4. Foundation";
+            gotoxy(73, 18);
+            color(Set[3]);
+            cout << "4. Foundation";
 
-        gotoxy(89, 18);
-        color(Set[4]);
-        cout << "5. A-Level";
+            gotoxy(89, 18);
+            color(Set[4]);
+            cout << "5. A-Level";
+        }
+        else if (check == 2) {
+            gotoxy(16, 15);
+            color(Set[0]);
+            cout << "1. Diploma";
+
+            gotoxy(29, 15);
+            color(Set[1]);
+            cout << "2. STPM";
+
+            gotoxy(39, 15);
+            color(Set[2]);
+            cout << "3. Matriculation";
+
+            gotoxy(58, 15);
+            color(Set[3]);
+            cout << "4. Foundation";
+
+            gotoxy(74, 15);
+            color(Set[4]);
+            cout << "5. A-Level";
+        }
+        
 
         key = _getch();
         if (key == 75 && (counter >= 2 && counter <= 5)) { counter--; } //75 for arrow left key
@@ -459,7 +470,7 @@ int arrowKeySelection::eduLevelSelection() {
 }
 
 
-//start of PENTINGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG
+
 int arrowKeySelection::resetOrProceed(int& check) {
 
     int Set[] = { 7,12 }; // DEFAULT COLORS
@@ -516,7 +527,7 @@ int arrowKeySelection::resetOrProceed(int& check) {
         return counter;
     }
 }
-//end of PENTINGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG
+
 
 int arrowKeySelection::editStuDetailSelection() {
 
@@ -525,11 +536,11 @@ int arrowKeySelection::editStuDetailSelection() {
     char key;
 
     for (int i = 0;;) {
-        gotoxy(26, 39);
+        gotoxy(26, 40);
         color(Set[0]);
         cout << "1. Back";
 
-        gotoxy(42, 39);
+        gotoxy(42, 40);
         color(Set[1]);
         cout << "2. Edit";
 
@@ -765,7 +776,7 @@ int arrowKeySelection::adminPageSelection() {
 
 int arrowKeySelection::adminGraphSelection() {
 
-    int Set[] = { 12,7,7,7,7 }; // DEFAULT COLORS
+    int Set[] = { 12,7,7 }; // DEFAULT COLORS
     int counter = 1;
     char key;
 
@@ -781,19 +792,11 @@ int arrowKeySelection::adminGraphSelection() {
 
         gotoxy(32, 15);
         color(Set[2]);
-        cout << "3. View Total Number of Students In Each Courses";
-
-        gotoxy(32, 17);
-        color(Set[3]);
-        cout << "4. UNKNOWN";
-
-        gotoxy(32, 19);
-        color(Set[4]);
-        cout << "5. UNKNOWN";
+        cout << "3. Back To Admin Main Menu";
 
         key = _getch();
-        if (key == 72 && (counter >= 2 && counter <= 5)) { counter--; } //72 for arrow up key
-        if (key == 80 && (counter >= 1 && counter <= 4)) { counter++; }  //80 for arrow down key
+        if (key == 72 && (counter >= 2 && counter <= 3)) { counter--; } //72 for arrow up key
+        if (key == 80 && (counter >= 1 && counter <= 2)) { counter++; }  //80 for arrow down key
 
         if (key == '\r')//carriage return
         {   // if enter is click and highlight is on 1 the program will run the code here
@@ -806,26 +809,17 @@ int arrowKeySelection::adminGraphSelection() {
             if (counter == 3) {
                 break;
             }
-            if (counter == 4) {
-                break;
-            }
-            if (counter == 5) {
-                break;
-            }
         }
         //default white
         Set[0] = 7;
         Set[1] = 7;
         Set[2] = 7;
-        Set[3] = 7;
-        Set[4] = 7;
+
 
         //set colours during selection
         if (counter == 1) { Set[0] = 12; }
         if (counter == 2) { Set[1] = 12; }
         if (counter == 3) { Set[2] = 12; }
-        if (counter == 4) { Set[3] = 12; }
-        if (counter == 5) { Set[4] = 12; }
     }
 
     if (counter == 1) {
@@ -838,15 +832,6 @@ int arrowKeySelection::adminGraphSelection() {
     }
     else if (counter == 3) {
         system("cls");
-        return counter;
-    }
-    else if (counter == 4) {
-        system("cls");
-        return counter;
-    }
-    else if (counter == 5) {
-        system("cls");
-        //system("color 0f");
         return counter;
     }
 }
@@ -861,7 +846,7 @@ int arrowKeySelection::adminStudentListSelection() {
 
         gotoxy(32, 13);
         color(Set[0]);
-        cout << "1. View List Of Student Based On GENDER";
+        cout << "1. View List Of Registered Students Who Have Inserted STUDENT DETAILS";
 
         gotoxy(32, 15);
         color(Set[1]);
@@ -869,19 +854,16 @@ int arrowKeySelection::adminStudentListSelection() {
 
         gotoxy(32, 17);
         color(Set[2]);
-        cout << "3. View List Of Student Based On WORK EXPERIENCE";
+        cout << "3. View List Of Approved Student Based on COURSES";
 
         gotoxy(32, 19);
         color(Set[3]);
-        cout << "4. View List Of Student Based On AGE";
+        cout << "4. Back To Admin Main Menu";
 
-        gotoxy(32, 21);
-        color(Set[4]);
-        cout << "5. Back To Admin Main Menu";
 
         key = _getch();
-        if (key == 72 && (counter >= 2 && counter <= 5)) { counter--; } //72 for arrow up key
-        if (key == 80 && (counter >= 1 && counter <= 4)) { counter++; }  //80 for arrow down key
+        if (key == 72 && (counter >= 2 && counter <= 4)) { counter--; } //72 for arrow up key
+        if (key == 80 && (counter >= 1 && counter <= 3)) { counter++; }  //80 for arrow down key
 
         if (key == '\r')//carriage return
         {   // if enter is click and highlight is on 1 the program will run the code here
@@ -897,23 +879,18 @@ int arrowKeySelection::adminStudentListSelection() {
             if (counter == 4) {
                 break;
             }
-            if (counter == 5) {
-                break;
-            }
         }
         //default white
         Set[0] = 7;
         Set[1] = 7;
         Set[2] = 7;
         Set[3] = 7;
-        Set[4] = 7;
 
         //set colours during selection
         if (counter == 1) { Set[0] = 12; }
         if (counter == 2) { Set[1] = 12; }
         if (counter == 3) { Set[2] = 12; }
         if (counter == 4) { Set[3] = 12; }
-        if (counter == 5) { Set[4] = 12; }
     }
 
     if (counter == 1) {
@@ -929,10 +906,6 @@ int arrowKeySelection::adminStudentListSelection() {
         return counter;
     }
     else if (counter == 4) {
-        system("cls");
-        return counter;
-    }
-    else if (counter == 5) {
         system("cls");
         system("color 0f");
         return counter;
