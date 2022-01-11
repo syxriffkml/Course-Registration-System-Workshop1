@@ -74,7 +74,7 @@ void function::mainMenu() {
     WriteInColor(11, "      +----------------------------------------------------------+\n"); //start here, the text color will be
     WriteInColor(11, "      | INSTRUCTION : (1) Move arrow keys (Up, Down) to move the |\n");
     WriteInColor(11, "      | selection and press ENTER key to select                  |\n");
-    WriteInColor(11, "      | (2) Please run the program in fullscreen                 |\n");
+    WriteInColor(11, "      | (2) Running the programme in fullscreen is recommended ! |\n");
     WriteInColor(11, "      +----------------------------------------------------------+\n");
     WriteInColor(7, " "); // change back the next text colour to white
     //selection = arrowKey.mainMenuSelection(); 
@@ -85,9 +85,9 @@ void function::mainMenu() {
 
 //Start of student register function
 void function::registration() {
-
+    redoICNumber:
     arrowKeySelection arrow;
-    string username, ic_num, gender, email, password;
+    string username, ic_num="", gender, email, password;
     int genderSelect, check = 1;
 
     cout << "========================================================================" << endl;
@@ -96,8 +96,26 @@ void function::registration() {
     cout << "\nEnter username : ";
     getline(cin, username);
 
+
     cout << "\nEnter IC number ( without - ) : ";
     cin >> ic_num;
+    if (ic_num.size() > 12) {
+        cout << "You entered "; WriteInColor(12,"MORE THAN"); WriteInColor(7,""); cout << " 12 digits, IC number needs to have exactly 12 digits. Please re-enter your IC number." << endl << endl;
+        cin.ignore();
+        system("pause");
+        system("cls");
+        goto redoICNumber;
+    }
+    else if (ic_num.size() < 12) {
+        cout << "You entered "; WriteInColor(12, "LESS THAN"); WriteInColor(7, ""); cout << " 12 digits, IC number needs to have exactly 12 digits. Please re-enter your IC number." << endl << endl;
+        cin.ignore();
+        system("pause");
+        system("cls");
+        goto redoICNumber;
+    }
+    
+    //cout << "\nEnter IC number ( without - ) : ";
+    //cin >> ic_num;
 
     cout << "\nEnter gender (Male or Female) : ";
     genderSelect = arrow.maleOrFemale(check);
@@ -162,7 +180,7 @@ void function::registration() {
 int function::studentLogin() {
 
     int count = 0;
-student_login:
+    student_login:
     string ic_num, password = "", studentPasswordDB, studentICnum;
     char ch;
 
@@ -269,7 +287,7 @@ void function::studentMenu() {
             cout << "Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
         } 
         cout << "( Welcome, user ";
-        WriteInColor(11, username + " " + stuID);//start here, the text color will be
+        WriteInColor(11, username);//start here, the text color will be
         WriteInColor(7, " )\n"); // change back the next text colour to white
         cout << "========================================================================" << endl;   
         cout << "                              STUDENT MENU                             " << endl;
@@ -296,7 +314,7 @@ void function::studentDetail() {
     string fullname, address, phoneNum, maritalStatus, eduLevel;
 
     cout << "( Welcome, user ";
-    WriteInColor(11, username + " " + stuID);//start here, the text color will be
+    WriteInColor(11, username);//start here, the text color will be
     WriteInColor(7, " )\n"); // change back the next text colour to white
     cout << "========================================================================" << endl;
     cout << "                              STUDENT MENU                              " << endl;
@@ -401,7 +419,7 @@ void function::editStudentDisplay() {
     string cgpaResult;
 
     cout << "( Welcome, user ";
-    WriteInColor(11, username + " " + stuID);//start here, the text color will be
+    WriteInColor(11, username);//start here, the text color will be
     WriteInColor(7, " )\n"); // change back the next text colour to white
     cout << "========================================================================" << endl;
     cout << "                              STUDENT MENU                              " << endl;
@@ -463,7 +481,7 @@ void function::editStudentDisplay() {
                     int check = 2; //check 2 for edit student detail 
                     string newUsername, newEmail, newHomeAddress, newPhoneNum, newMaritalStatus;
                     cout << "( Welcome, user ";
-                    WriteInColor(11, username + " " + stuID);//start here, the text color will be
+                    WriteInColor(11, username);//start here, the text color will be
                     WriteInColor(7, " )\n"); // change back the next text colour to white
                     cout << "========================================================================" << endl;
                     cout << "                              STUDENT MENU                              " << endl;
@@ -539,7 +557,7 @@ void function::displayFacultyAndCourses() {
     int facultyselect = 0,check = 1; //check = 2 for application
 
     cout << "( Welcome, user ";
-    WriteInColor(11, username + " " + stuID);//start here, the text color will be
+    WriteInColor(11, username);//start here, the text color will be
     WriteInColor(7, " )\n"); // change back the next text colour to white
     cout << "=======================================================================================================" << endl;
     cout << "                                               STUDENT MENU                                            " << endl;
@@ -558,22 +576,39 @@ void function::displayFacultyAndCourses() {
     check = 0; //reset check
 
     cout << "( Welcome, user ";
-    WriteInColor(11, username + " " + stuID);//start here, the text color will be
+    WriteInColor(11, username);//start here, the text color will be
     WriteInColor(7, " )\n"); // change back the next text colour to white
     cout << "=======================================================================================================" << endl;
     cout << "                                               STUDENT MENU                                            " << endl;
     cout << "                                             -list of courses-                                         " << endl;
     cout << "=======================================================================================================" << endl << endl;
 
+    WriteInColor(11, "                       +----------------------------------------------------------+\n"); //start here, the text color will be
+    WriteInColor(11, "                       | INFO :                                                   |\n");
+    WriteInColor(11, "                       | Student's CGPA below the required CGPA will have their   |\n");
+    WriteInColor(11, "                       | CGPA and work experience checked to see if they are      |\n");
+    WriteInColor(11, "                       | eligible for the minimum requirements                    |\n");
+    WriteInColor(11, "                       +----------------------------------------------------------+\n");
+    WriteInColor(7, "\n\n"); // change back the next text colour to white
+
     string facultyQuery = "select * from courses where faculty_id = '" + fs + "'";
     const char* fQuery = facultyQuery.c_str();
     qstate = mysql_query(conn, fQuery);
 
     if (!qstate) {
+        
+        cout << "==============================================================================================================================================================" << endl;
+        cout << "|                                                                          COURSE INFO                                                                       |" << endl;
+        cout << "|------------------------------------------------------------------------------------------------------------------------------------------------------------|" << endl;
+        cout << "| Course Code | Course Name                                                                      | Required CGPA    | Minimum CGPA | Minimum Work Experience |" << endl;
+        cout << "|============================================================================================================================================================|" << endl;
+        cout << "|             |                                                                                  |                  |              |                         |" << endl;
         res = mysql_store_result(conn);
         while (row = mysql_fetch_row(res)) {
-            cout << "Course Code : " << row[2] << setw(20) << "Course Name : " << row[3] << endl;
+            cout << left << "| " << setw(11) << row[2] << " | " << setw(81) << row[3] << "| " << setw(16) << row[4] << " | " << setw(12) << row[5] << " | " << setw(24) << row[6] << "| "  << endl;
+            cout << "|             |                                                                                  |                  |              |                         |" << endl;
         }
+        cout << "==============================================================================================================================================================" << endl << right << endl;
     }
     else {
         cout << "Query Execution Problem! MySQL Error #" << mysql_errno(conn) << endl;
@@ -585,7 +620,7 @@ void function::displayFacultyAndCourses() {
 //Start of add grades/cgpa menu
 void function::addGradesMenu() {
     cout << "( Welcome, user ";
-    WriteInColor(11, username + " " + stuID);//start here, the text color will be
+    WriteInColor(11, username);//start here, the text color will be
     WriteInColor(7, " )\n"); // change back the next text colour to white
     cout << "=======================================================================================================" << endl;
     cout << "                                               STUDENT MENU                                            " << endl;
@@ -738,7 +773,7 @@ void function::addGrades() {
 //Start of application menu
 void function::applicationMenu() {
     WriteInColor(7, "( Welcome, user ");
-    WriteInColor(11, username + " " + stuID);//start here, the text color will be
+    WriteInColor(11, username);//start here, the text color will be
     WriteInColor(7, " )\n"); // change back the next text colour to white
     cout << "=======================================================================================================" << endl;
     cout << "                                               STUDENT MENU                                            " << endl;
@@ -863,7 +898,7 @@ void function::application() {
 //Start of view application function
 void function::viewApplication() {
     cout << "( Welcome, user ";
-    WriteInColor(11, username + " " + stuID);//start here, the text color will be
+    WriteInColor(11, username);//start here, the text color will be
     WriteInColor(7, " )\n"); // change back the next text colour to white
     cout << "=======================================================================================================" << endl;
     cout << "                                               STUDENT MENU                                            " << endl;
@@ -916,7 +951,7 @@ void function::viewApplication() {
 //Start of application result function
 void function::applicationResult() {
     cout << "( Welcome, user ";
-    WriteInColor(11, username + " " + stuID);//start here, the text color will be
+    WriteInColor(11, username);//start here, the text color will be
     WriteInColor(7, " )\n"); // change back the next text colour to white
     cout << "=======================================================================================================" << endl;
     cout << "                                               STUDENT MENU                                            " << endl;
@@ -978,7 +1013,7 @@ int function::adminLogin() {
     cout << "========================================================================" << endl;
     cout << "Enter Admin Username : ";
     //cin.ignore();
-    getline(cin, adminName);
+    getline(cin >> ws, adminName);
 
     cout << "Enter Admin Password : ";
     while (ch = _getch()) { //assign ASCII value to ch
@@ -1541,6 +1576,7 @@ void function::adminViewStudentList() {
             cout << setw(106) << "==================================================================================================" << endl;
             cout << setw(106) << "| Student ID |           Username           |     IC_Number     |   Gender   |  Education Level  |" << endl;
             cout << setw(106) << "==================================================================================================" << endl;
+            cout << setw(106) << "|            |                              |                   |            |                   |" << endl;
             while (row = mysql_fetch_row(res)) {
                 cout << setw(9) << "|" << setw(11) << row[0] << " |" << setw(29) << row[1] << " |" << setw(18) << row[2] << " |" << setw(11) << row[3] << " |" << setw(18) << row[12] << " |" << endl;
             }
@@ -1579,6 +1615,7 @@ void function::adminViewStudentList() {
             cout << setw(106) << "==================================================================================================" << endl;
             cout << setw(106) << "| Student ID |           Username           |     IC_Number     |   Gender   |  Education Level  |" << endl;
             cout << setw(106) << "==================================================================================================" << endl;
+            cout << setw(106) << "|            |                              |                   |            |                   |" << endl;
             while (row = mysql_fetch_row(res)) {
                 cout << setw(9) << "|" << setw(11) << row[0] << " |" << setw(29) << row[1] << " |" << setw(18) << row[2] << " |" << setw(11) << row[3] << " |" << setw(18) << row[12] << " |" << endl;
             }
@@ -1640,6 +1677,7 @@ void function::adminViewStudentList() {
             cout  << "==================================================================================================" << endl;
             cout  << "| Student ID |           Username           |     IC_Number     |   Gender   |  Education Level  |" << endl;
             cout  << "==================================================================================================" << endl;
+            cout << setw(106) << "|            |                              |                   |            |                   |" << endl;
             while (row = mysql_fetch_row(res)) {
                 cout  << "|" << setw(11) << row[0] << " |" << setw(29) << row[1] << " |" << setw(18) << row[2] << " |" << setw(11) << row[3] << " |" << setw(18) << row[12] << " |" << endl;
             }
@@ -1789,13 +1827,13 @@ void function::adminApproval() {
         cout << setw(32) << right << "| Past Studies CGPA :  " << setw(35) << left; WriteInColor(6, cgpa); WriteInColor(7, ""); cout << setw(31) << right << " |" << endl;
         cout << setw(98) << "=========================================================================================" << endl << endl;
 
-        cout << "=================================================================================================================" << endl;
-        cout << "|                                                 APPLICATION INFO                                              |" << endl;
-        cout << "|---------------------------------------------------------------------------------------------------------------|" << endl;
-        cout << "| Course Code | Course Name                                                                      | Eligibility  |" << endl;
-        cout << "|===============================================================================================================|" << endl;
+        cout << "============================================================================================================================================================================" << endl;
+        cout << "|                                                                        APPLICATION INFO                                                                                  |" << endl;
+        cout << "|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|" << endl;
+        cout << "| Course Code | Course Name                                                                      | Required CGPA    | Minimum CGPA | Minimum Work Experience | Eligibility |" << endl;
+        cout << "|==========================================================================================================================================================================|" << endl;
         //display course 1
-        string facultyQuery1 = "select * from courses where programme_code in(select course1 from application where student_id = '" + studentID + "')";
+        string facultyQuery1 = "select * from courses where programme_code in(select course1 from application where student_id = '" + studentID + "')"; 
         const char* fQuery1 = facultyQuery1.c_str();
         qstate = mysql_query(conn, fQuery1);
         if (!qstate) {
@@ -1818,16 +1856,16 @@ void function::adminApproval() {
                 z >> minWorkExp;
                 // END OF CASTING, CHANGE STRING TO INT
                 if (doubleCGPA >= recomendCGPA) {
-                    cout << left << "| " << setw(11) << row[2] << " | " << setw(81) << row[3] << "| " << setw(13); WriteInColor(10,"YES"); WriteInColor(7,""); cout << "|" << endl;
-                    cout << "|---------------------------------------------------------------------------------------------------------------|" << endl;
+                    cout << left << "| " << setw(11) << row[2] << " | " << setw(81) << row[3] << "| " << setw(16) << recommendedCGPA << " | " << setw(12) << minimumCGPA << " | " << setw(24) << minimumWork_exp << "| " << setw(12); WriteInColor(10,"YES"); WriteInColor(7,""); cout << "|" << endl;
+                    cout << "|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|" << endl;
                 }
-                else if( ((doubleCGPA < recomendCGPA) && (doubleCGPA >= minCGPA)) && (intWork_exp > minWorkExp) ){
-                    cout << left << "| " << setw(11) << row[2] << " | " << setw(81) << row[3] << "| " << setw(13); WriteInColor(14, "YES"); WriteInColor(7,""); cout << "|" << endl;
-                    cout << "|---------------------------------------------------------------------------------------------------------------|" << endl;
+                else if( ((doubleCGPA < recomendCGPA) && (doubleCGPA >= minCGPA)) && (intWork_exp >= minWorkExp) ){
+                    cout << left << "| " << setw(11) << row[2] << " | " << setw(81) << row[3] << "| " << setw(16) << recommendedCGPA << " | " << setw(12) << minimumCGPA << " | " << setw(24) << minimumWork_exp << "| " << setw(12); WriteInColor(14, "YES"); WriteInColor(7,""); cout << "|" << endl;
+                    cout << "|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|" << endl;
                 }
                 else {
-                    cout << left << "| " << setw(11) << row[2] << " | " << setw(81) << row[3] << "| " << setw(13); WriteInColor(12, "NO"); WriteInColor(7,""); cout << "|" << endl;
-                    cout << "|---------------------------------------------------------------------------------------------------------------|" << endl;
+                    cout << left << "| " << setw(11) << row[2] << " | " << setw(81) << row[3] << "| " << setw(16) << recommendedCGPA << " | " << setw(12) << minimumCGPA << " | " << setw(24) << minimumWork_exp << "| " << setw(12); WriteInColor(12, "NO"); WriteInColor(7, ""); cout << "|" << endl;
+                    cout << "|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|" << endl;
                     course1 = row[2];
                     count++;
                 }
@@ -1857,16 +1895,16 @@ void function::adminApproval() {
                 z >> minWorkExp;
                 // END OF CASTING, CHANGE STRING TO INT
                 if (doubleCGPA >= recomendCGPA) {
-                    cout << left << "| " << setw(11) << row[2] << " | " << setw(81) << row[3] << "| " << setw(13); WriteInColor(10, "YES"); WriteInColor(7, ""); cout << "|" << endl;
-                    cout << "|---------------------------------------------------------------------------------------------------------------|" << endl;
+                    cout << left << "| " << setw(11) << row[2] << " | " << setw(81) << row[3] << "| " << setw(16) << recommendedCGPA << " | " << setw(12) << minimumCGPA << " | " << setw(24) << minimumWork_exp << "| " << setw(12); WriteInColor(10, "YES"); WriteInColor(7, ""); cout << "|" << endl;
+                    cout << "|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|" << endl;
                 }
-                else if (((doubleCGPA < recomendCGPA) && (doubleCGPA >= minCGPA)) && (intWork_exp > minWorkExp)) {
-                    cout << left << "| " << setw(11) << row[2] << " | " << setw(81) << row[3] << "| " << setw(13); WriteInColor(14, "YES"); WriteInColor(7, ""); cout << "|" << endl;
-                    cout << "|---------------------------------------------------------------------------------------------------------------|" << endl;
+                else if (((doubleCGPA < recomendCGPA) && (doubleCGPA >= minCGPA)) && (intWork_exp >= minWorkExp)) {
+                    cout << left << "| " << setw(11) << row[2] << " | " << setw(81) << row[3] << "| " << setw(16) << recommendedCGPA << " | " << setw(12) << minimumCGPA << " | " << setw(24) << minimumWork_exp << "| " << setw(12); WriteInColor(14, "YES"); WriteInColor(7, ""); cout << "|" << endl;
+                    cout << "|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|" << endl;
                 }
                 else {
-                    cout << left << "| " << setw(11) << row[2] << " | " << setw(81) << row[3] << "| " << setw(13); WriteInColor(12, "NO"); WriteInColor(7, ""); cout << "|" << endl;
-                    cout << "|---------------------------------------------------------------------------------------------------------------|" << endl;
+                    cout << left << "| " << setw(11) << row[2] << " | " << setw(81) << row[3] << "| " << setw(16) << recommendedCGPA << " | " << setw(12) << minimumCGPA << " | " << setw(24) << minimumWork_exp << "| " << setw(12); WriteInColor(12, "NO"); WriteInColor(7, ""); cout << "|" << endl;
+                    cout << "|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|" << endl;
                     course2 = row[2];
                     count++;
                 }
@@ -1896,16 +1934,16 @@ void function::adminApproval() {
                 z >> minWorkExp;
                 // END OF CASTING, CHANGE STRING TO INT
                 if (doubleCGPA >= recomendCGPA) { //doubleCGPA
-                    cout << left << "| " << setw(11) << row[2] << " | " << setw(81) << row[3] << "| " << setw(13); WriteInColor(10, "YES"); WriteInColor(7, ""); cout << "|" << endl;
-                    cout << "=================================================================================================================" << endl << right << endl;
+                    cout << left << "| " << setw(11) << row[2] << " | " << setw(81) << row[3] << "| " << setw(16) << recommendedCGPA << " | " << setw(12) << minimumCGPA << " | " << setw(24) << minimumWork_exp << "| " << setw(12); WriteInColor(10, "YES"); WriteInColor(7, ""); cout << "|" << endl;
+                    cout << "============================================================================================================================================================================" << endl << right << endl;
                 }
-                else if (((doubleCGPA < recomendCGPA) && (doubleCGPA >= minCGPA)) && (intWork_exp > minWorkExp)) {
-                    cout << left << "| " << setw(11) << row[2] << " | " << setw(81) << row[3] << "| " << setw(13); WriteInColor(14, "YES"); WriteInColor(7, ""); cout << "|" << endl;
-                    cout << "=================================================================================================================" << endl << right << endl;
+                else if (((doubleCGPA < recomendCGPA) && (doubleCGPA >= minCGPA)) && (intWork_exp >= minWorkExp)) {
+                    cout << left << "| " << setw(11) << row[2] << " | " << setw(81) << row[3] << "| " << setw(16) << recommendedCGPA << " | " << setw(12) << minimumCGPA << " | " << setw(24) << minimumWork_exp << "| " << setw(12); WriteInColor(14, "YES"); WriteInColor(7, ""); cout << "|" << endl;
+                    cout << "============================================================================================================================================================================" << endl << right << endl;
                 }
                 else {
-                    cout << left << "| " << setw(11) << row[2] << " | " << setw(81) << row[3] << "| " << setw(13); WriteInColor(12, "NO"); WriteInColor(7, ""); cout << "|" << endl;
-                    cout << "=================================================================================================================" << endl << right << endl;
+                    cout << left << "| " << setw(11) << row[2] << " | " << setw(81) << row[3] << "| " << setw(16) << recommendedCGPA << " | " << setw(12) << minimumCGPA << " | " << setw(24) << minimumWork_exp << "| " << setw(12); WriteInColor(12, "NO"); WriteInColor(7, ""); cout << "|" << endl;
+                    cout << "============================================================================================================================================================================" << endl << right << endl;
                     course3 = row[2];
                     count++;
                 }

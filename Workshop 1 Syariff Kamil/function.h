@@ -6,7 +6,7 @@ using namespace std;
 class function {
 	public:
 		static void ConnectionFunction();
-		void WriteInColor(unsigned short,string);
+		void WriteInColor(unsigned short,string); 
 		void mainMenu();
 		void registration();
 		int studentLogin(); //  START OF STUDENT PARTS

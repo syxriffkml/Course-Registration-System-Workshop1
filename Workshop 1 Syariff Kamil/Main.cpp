@@ -25,6 +25,10 @@ extern string stuID, username, subjectID, adminID, adminUser;
 
 int main() {
     //fixed console size   
+    HWND console = GetConsoleWindow();
+    RECT r;
+    GetWindowRect(console, &r); //stores the console's current dimensions
+    MoveWindow(console, r.left, r.top, 1600, 900, TRUE); 
     system("color 0f"); //0-black bg, f- white text
     //end of fixed console size
 
@@ -139,6 +143,7 @@ int main() {
                                     system("cls");
                                 }
                                 else if (studentSelection == 6) { // "logout"
+                                    cin.ignore();
                                     goto start;
                                 }
                             }
@@ -179,7 +184,7 @@ int main() {
                     cin >> backToAdminMenu;
                     system("cls");
                 }
-                else if (adminSelection == 5) { //"logout"
+                else if (adminSelection == 4) { //"logout"
                     goto start;
                 }
             } while (backToAdminMenu == 1);
